@@ -1,0 +1,7 @@
+*.tmproj
+*.bak
+.idea/
+bower_components/
+node_modules/
+src/
+npm-debug.log
