@@ -12,13 +12,19 @@ router.get('/list', function(req, res, next) {
   res.json({message:'respond with a resource'});
 });
 
-router.post('/add', action_add_user);
+router.post('/register', action_add_user);
 
 function action_add_user(req,res){
-    var name = req.body.name;
-    var email = req.body.email;
+    var reqBody = req.body;
+    console.log(reqBody);
+    if(!reqBody){
+        return res.status(400).send({error:"Body should not be empty"});
+    }
+    if(reqBody.password){
+        return res.status(400).send({error:"Password is required"});
+    }
 
-    var user = new User({ name: name, email: email});
+    var user = new User(reqBody);
 
     user.save(function (err, user) {
         if(err){

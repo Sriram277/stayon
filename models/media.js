@@ -3,18 +3,18 @@ module.exports = function (mongoose) {
     var Schema = mongoose.Schema;
 
     var mediaSchema = new Schema({
-        mediaidpk: String,
         useridfk: String,
         org_filename: String,
         filename: {type:String},
-        filetype:[String],
+        filetype:String,
         format: String,
         size:String,
         width:String,
         height: String,
         duration: String,
         status: String,
-        created_on: String
+        location: String,
+        created_on: {type: Date, "default": Date.now}
     },{ strict: false });
 
 
@@ -37,7 +37,7 @@ CREATE TABLE `dw_media` (
 */
     
     
-    var Media = mongoose.model('User', mediaSchema);
+    var Media = mongoose.model('Media', mediaSchema);
 
     return Media;
 };

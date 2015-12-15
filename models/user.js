@@ -12,18 +12,31 @@ module.exports = function (mongoose) {
 //    },{ strict: false });
 
     var usersSchema = new Schema({
-        name: String,
-        picture: String,
-        password : {type:String, select:false, "default":'creatives@1'},
+        fullname: String,
+        password : String,
         email: String,
-        token: {type:String},
-        roles:[String],
+        dateofbirth: Date,
+        gender: {
+            type: 'string',
+            enum: [
+                'M',
+                'F',
+                'O'
+            ],
+            defaultsTo: 'M'
+        },
+        timezone: String,
+        country: String,
+        state: String,
+        city: String,
+        subscription: String,
+        user_role: String,
+        activation_key: String,
+        activation_valid_upto: Date,
+        status: String,
 //        tickets:[TicketSchema],
 //        leaves : [{ type: Schema.ObjectId, ref: 'Leave' }],
-        totalLeaves: {type:Number , default: 16},
-        leavesRemaining:{type:Number, default: 16},
-        leavesTaken:{type:Number, default: 0},
-        created_at: {type: Date, "default": Date.now}
+        created_on: {type: Date, "default": Date.now}
     },{ strict: false });
 
 
