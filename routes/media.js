@@ -47,9 +47,9 @@ router.post('/uploadfiles', function(req, res, next) {
 
         uploadFile.upload({
             adapter: require('skipper-s3'),
-            key: 'AKIAIEW4EC7ND74CTBGQ',
-            secret: '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',
-            bucket: 'zugworks-dev'
+            key: 'AKIAJ57OGHEUSFKPWXMA',
+            secret: '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',
+            bucket: 'stayon'
         }, function (err, filesUploaded) {
 
             if (err) return res.status(500).send(err);
