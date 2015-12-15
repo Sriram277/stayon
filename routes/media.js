@@ -49,7 +49,7 @@ router.post('/uploadfiles', function(req, res, next) {
             adapter: require('skipper-s3'),
             key: 'AKIAJ57OGHEUSFKPWXMA',
             secret: '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',
-            bucket: 'stayon'
+            bucket: 'stay-on'
         }, function (err, filesUploaded) {
 
             if (err) return res.status(500).send(err);
