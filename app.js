@@ -9,6 +9,7 @@ var mongoose = require('mongoose');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var media = require('./routes/media');
+var widget = require('./routes/widget');
 
 var debug = require('debug')('digital-wall:server');
 var http = require('http');
@@ -45,6 +46,7 @@ app.use(require('skipper')());
 app.use('/', routes);
 app.use('/users', users);
 app.use('/media', media);
+app.use('/widget', widget);
 
 
 // catch 404 and forward to error handler

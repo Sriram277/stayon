@@ -15,9 +15,9 @@ d.on('error', function () {
 // Multiple files upload
 router.post('/uploadfiles', action_upload_files);
 
-router.post('/add', action_add_media);
-
 router.get('/list/files', action_list_files);
+
+router.delete('/file/:id', action_delete_file);
 
 function action_upload_files(req, res) {
     var validated = true,
@@ -66,16 +66,13 @@ function action_upload_files(req, res) {
                 secret: 'n9KjAbszdhtVlZ5T30semCA06sdxvBd/lenF0d2e',
                 bucket: 'stay-on'
             }, function (err, filesUploaded) {
-
+                var resultArray = [];
                 if (err) return res.status(500).send(err);
 
                 else if (filesUploaded.length === 0) {
 
                     return res.status(400).send({error: 'error.file.upload.empty'});
                 } else {
-                    console.log("saving");
-                    console.log(filesUploaded.length);
-                    var resultArray = [];
                     _.each(filesUploaded, function (list, index) {
                         var data = {};
                         list.filetype = list.type;
@@ -86,22 +83,21 @@ function action_upload_files(req, res) {
                         delete list.type;
                         delete list.filename;
                         delete list.fd;
-                        console.log(resultArray);
                         var media = new Media(list);
                         media.save(function (err, media) {
-                            console.log(media);
                             if(err || !media){
                                 console.log(err);
                             }
                             else{
                                 resultArray.push(media);
+                                if (index === filesUploaded.length - 1) {
+                                    return res.json({
+                                        files: resultArray
+                                    });
+                                }
                             }
                         });
-                        if (index === filesUploaded.length - 1) {
-                            return res.json({
-                                files: resultArray
-                            });
-                        }
+
 
                     });
 
@@ -115,29 +111,31 @@ function action_upload_files(req, res) {
     }
 }
 
-function action_add_media(data, cb) {
-    var media = new Media(data);
-    media.save(function (err, media) {
-        console.log(media);
-        if (err || !media) {
-            cb(err, null);
-        }
-        else {
-            cb(null, media);
-        }
-    });
-}
-
 function action_list_files(req, res, next) {
-    function get_users_service(req, res) {
-        Media.find({}, function (err, user) {
+        console.log(req.query);
+        Media.find({},{}, { limit: req.query.limit ? req.query.limit : null,
+            sort: req.query.sort ? req.query.sort : "size",
+            skip: req.query.skip ? req.query.skip : null }, function (err, user) {
             if (err) {
                 res.json(err);
             } else {
                 res.json(user);
             }
         });
+}
+
+function action_delete_file(req, res) {
+    if(!req.params.id){
+        return res.status(400).send({error: "fileid required"});
     }
+    Media.findByIdAndRemove(req.params.id, function (err, file) {
+        if (!err) {
+            res.send("successfully file deleted" + file);
+        }else{
+            res.send("error in removing user"+ err);
+        }
+
+    });
 }
 
 
