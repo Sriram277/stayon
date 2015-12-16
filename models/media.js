@@ -8,7 +8,7 @@ module.exports = function (mongoose) {
         filename: {type:String},
         filetype:String,
         format: String,
-        size:String,
+        size:Number,
         width:String,
         height: String,
         duration: String,
