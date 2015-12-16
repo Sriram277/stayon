@@ -22,7 +22,7 @@ module.exports = function (mongoose) {
         updated_on: {type: Date, "default": Date.now}
     },{ strict: false });
 
-    var Media = mongoose.model('Media', mediaSchema);
+    var Widget = mongoose.model('Widget', mediaSchema);
 
-    return Media;
+    return Widget;
 };
