@@ -10,11 +10,13 @@ router.post('/save', action_save_widgets);
 
 router.get('/list/files', action_list_widgets);
 
-router.delete('/delete/:id', action_delete_widget);
+router.delete('/delete/:id', action_remove_widget);
+
+router.put('/edit/:id', action_edit_widget);
 
 function action_save_widgets(req, res) {
 
-    var Widget = new Widget(req.body);
+    var widget = new Widget(req.body);
     widget.save(function (err, widget) {
         if (err || !widget) {
             res.status(500).send(err);
@@ -42,7 +44,7 @@ function action_list_widgets(req, res, next) {
     });
 }
 
-function action_delete_widget(req, res) {
+function action_remove_widget(req, res) {
     if (!req.params.id) {
         return res.status(400).send({error: "fileid required"});
     }
@@ -53,6 +55,16 @@ function action_delete_widget(req, res) {
             res.send("error in removing user" + err);
         }
 
+    });
+}
+
+function action_edit_widget(req, res){
+    Widget.findOneAndUpdate({_id: req.params.id}, req.body, {upsert: true}, function (err, widget) {
+        if (!err) {
+            return res.status(200).send(widget);
+        } else {
+            res.status(500).send("error in updating Request" + err);
+        }
     });
 }
 
