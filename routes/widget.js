@@ -3,7 +3,7 @@ var router = express.Router();
 var _ = require('underscore');
 
 var mongoose = require('mongoose');
-var Widget = require('../models/widget')(mongoose);
+var Widget = mongoose.model('Widget');
 
 
 router.post('/save', action_save_widgets);

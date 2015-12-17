@@ -4,7 +4,7 @@ var _ = require('underscore');
 
 var mongoose = require('mongoose');
 
-var User = require('../models/user')(mongoose);
+var User = mongoose.model('User');
 var morgan = require("morgan");
 
 /* GET users listing. */

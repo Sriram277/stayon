@@ -6,10 +6,19 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
+
+require('./models/user')(mongoose);
+require('./models/media')(mongoose)
+require('./models/widget')(mongoose)
+require('./models/displays')(mongoose)
+require('./models/device')(mongoose);
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var media = require('./routes/media');
 var widget = require('./routes/widget');
+var display = require('./routes/displays');
+var device = require('./routes/deviceinfo');
 
 var debug = require('debug')('digital-wall:server');
 var http = require('http');
@@ -17,6 +26,8 @@ var http = require('http');
 var app = express();
 
 var port = normalizePort(process.env.PORT || '3000');
+
+
 
 mongoose.connect('mongodb://localhost:27017/digital-wall');
 
@@ -40,11 +51,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(require('skipper')());
-
 app.use('/', routes);
 app.use('/users', users);
 app.use('/media', media);
 app.use('/widget', widget);
+app.use('/display', display);
+app.use('/device', device);
 
 
 // catch 404 and forward to error handler
