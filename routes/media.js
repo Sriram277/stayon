@@ -3,7 +3,7 @@ var router = express.Router();
 var _ = require('underscore');
 
 var mongoose = require('mongoose');
-var Media = require('../models/media')(mongoose);
+var Media = mongoose.model('Media');
 
 var d = require('domain').create()
 
