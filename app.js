@@ -12,6 +12,9 @@ require('./models/media')(mongoose)
 require('./models/widget')(mongoose)
 require('./models/displays')(mongoose)
 require('./models/device')(mongoose);
+require('./models/playlist')(mongoose);
+require('./models/schedular')(mongoose);
+
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -19,6 +22,8 @@ var media = require('./routes/media');
 var widget = require('./routes/widget');
 var display = require('./routes/displays');
 var device = require('./routes/deviceinfo');
+var playlist = require('./routes/playlist');
+var schedular = require('./routes/schedular');
 
 var debug = require('debug')('digital-wall:server');
 var http = require('http');
@@ -59,6 +64,8 @@ app.use('/media', media);
 app.use('/widget', widget);
 app.use('/display', display);
 app.use('/device', device);
+app.use('/playlist', playlist);
+app.use('/schedular',schedular);
 
 
 // catch 404 and forward to error handler
