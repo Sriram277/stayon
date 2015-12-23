@@ -34,7 +34,7 @@ var port = normalizePort(process.env.PORT || '3000');
 
 
 
-mongoose.connect('mongodb://localhost:27017/digital-wall');
+mongoose.connect('mongodb://localhost:27017/stay-on');
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
