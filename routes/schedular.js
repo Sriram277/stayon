@@ -20,7 +20,7 @@ function action_save_schedular(req, res) {
         return res.status(400).send({error:"Body should not be empty"});
     }
     
-    var schedular = new Schedular(reqBody);
+    var schedular = new Schedular(req.body);
     schedular.save(function (err, doc) {
     	if(err) {
     		res.json(err);
