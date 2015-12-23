@@ -65,7 +65,13 @@ app.use('/widget', widget);
 app.use('/display', display);
 app.use('/device', device);
 app.use('/playlist', playlist);
-app.use('/schedular',schedular);
+app.use('/schedular', schedular);
+
+
+
+
+
+
 
 
 // catch 404 and forward to error handler
@@ -99,6 +105,10 @@ app.use(function(err, req, res, next) {
     });
 });
 var server = http.createServer(app);
+var io = require('socket.io')(server);
+io.set('transports', ['polling', 'websocket']);
+
+//var socketio = require("./socketio")(io);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -163,5 +173,24 @@ function onListening() {
     var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     console.log('Listening on ' + bind);
 }
+
+/// Socket Connection:
+
+function sendHeartbeat() {
+    setTimeout(sendHeartbeat, 3000);
+    io.sockets.emit('ping', {
+        beat: 1
+    });
+}
+
+io.sockets.on('connection', function(socket) {
+    socket.on('pong', function(data) {
+        //  console.log("Pong received from client(" + socket.id + ")");
+    });
+});
+
+setTimeout(sendHeartbeat, 8000);
+
+
 
 module.exports = app;
