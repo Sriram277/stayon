@@ -9,7 +9,7 @@ var Schedular = mongoose.model('Schedular');
 
 router.post('/save', action_save_schedular);
 
-router.get('/list/schedules', action_list_schedules);
+router.get('/list', action_list_schedules);
 
 router.delete('/delete/:id', action_delete_schedular);
 
