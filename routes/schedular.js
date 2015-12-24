@@ -9,7 +9,7 @@ var Schedular = mongoose.model('Schedular');
 
 router.post('/save', action_save_schedular);
 
-router.get('/list', action_list_schedules);
+router.get('/list', action_list_schedular);
 
 router.delete('/delete/:id', action_delete_schedular);
 
@@ -30,7 +30,7 @@ function action_save_schedular(req, res) {
     });
 }
 
-function action_list_schedules(req, res, next) {
+function action_list_schedular(req, res, next) {
     Schedular.find({}, {}, { limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
         skip: req.query.skip ? req.query.skip : null }, function (err, schedular) {

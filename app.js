@@ -25,7 +25,7 @@ var device = require('./routes/deviceinfo');
 var playlist = require('./routes/playlist');
 var schedular = require('./routes/schedular');
 
-var debug = require('debug')('digital-wall:server');
+var debug = require('debug')('stayon:server');
 var http = require('http');
 
 var app = express();
