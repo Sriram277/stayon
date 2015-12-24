@@ -15,7 +15,7 @@ module.exports = function(mongoose) {
             "default": Date.now
         }
     }, {
-        strict: true
+        strict: false
     });
 
 
