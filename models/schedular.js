@@ -1,14 +1,24 @@
-module.exports = function (mongoose) {
+module.exports = function(mongoose) {
     "use strict";
     var Schema = mongoose.Schema;
 
     var schedularSchema = new Schema({
-        starttime: String,
-        endtime: String,
-        playlist: Array
-    },{ strict: true });
-    
-    
+        userid: String,
+        playlist_id: String,
+        assets_count: String,
+        video_duration: String,
+        start_time: String,
+        end_time: String,
+        week_days: Array,
+        created_on: {
+            type: Date,
+            "default": Date.now
+        }
+    }, {
+        strict: false
+    });
+
+
     var Schedular = mongoose.model('Schedular', schedularSchema);
 
     return Schedular;

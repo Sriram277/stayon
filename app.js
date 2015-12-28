@@ -25,7 +25,7 @@ var device = require('./routes/deviceinfo');
 var playlist = require('./routes/playlist');
 var schedular = require('./routes/schedular');
 
-var debug = require('debug')('digital-wall:server');
+var debug = require('debug')('stayon:server');
 var http = require('http');
 
 var app = express();
@@ -50,8 +50,11 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
+
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -59,6 +62,7 @@ app.use(function (req, res, next) {
     res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.set('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,Accept');
+    res.header("Content-Type",'application/json');
     next();
 });
 
@@ -70,7 +74,13 @@ app.use('/widget', widget);
 app.use('/display', display);
 app.use('/device', device);
 app.use('/playlist', playlist);
-app.use('/schedular',schedular);
+app.use('/schedular', schedular);
+
+
+
+
+
+
 
 
 // catch 404 and forward to error handler
@@ -104,6 +114,9 @@ app.use(function(err, req, res, next) {
     });
 });
 var server = http.createServer(app);
+var io = require('socket.io')(server);
+io.set('transports', ['polling', 'websocket']);
+
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -142,9 +155,7 @@ function onError(error) {
         throw error;
     }
 
-    var bind = typeof port === 'string'
-        ? 'Pipe ' + port
-        : 'Port ' + port;
+    var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
     // handle specific listen errors with friendly messages
     switch (error.code) {
@@ -167,10 +178,27 @@ function onError(error) {
 
 function onListening() {
     var addr = server.address();
-    var bind = typeof addr === 'string'
-        ? 'pipe ' + addr
-        : 'port ' + addr.port;
+    var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     console.log('Listening on ' + bind);
 }
+
+/// Socket Connection:
+
+function sendHeartbeat() {
+    setTimeout(sendHeartbeat, 3000);
+    io.sockets.emit('ping', {
+        beat: 1
+    });
+}
+
+io.sockets.on('connection', function(socket) {
+    socket.on('pong', function(data) {
+        //  console.log("Pong received from client(" + socket.id + ")");
+    });
+});
+
+setTimeout(sendHeartbeat, 8000);
+
+
 
 module.exports = app;
