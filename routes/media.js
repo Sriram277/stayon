@@ -9,8 +9,7 @@ var d = require('domain').create()
 
 // Intentional noop - only fired when a file upload is aborted and the actual
 // error will be properly passed to the function callback below
-d.on('error', function () {
-})
+d.on('error', function() {})
 
 // Multiple files upload
 router.post('/uploadfiles', action_upload_files);
@@ -24,7 +23,8 @@ function action_upload_files(req, res) {
         settings = {
             allowedTypes: ['image/jpeg', 'image/png', 'image/jpg'],
             maxBytes: 10 * 1024 * 1024
-        }, uploadFile = req.file('content');
+        },
+        uploadFile = req.file('file');
 
     if (uploadFile && uploadFile._files.length !== 0) {
 
@@ -33,27 +33,29 @@ function action_upload_files(req, res) {
             byteCount = upload.byteCount
 
         // Validate file type
-//        if (_.indexOf(settings.allowedTypes, headers['content-type']) === -1) {
-//            validated = false;
-//            uploadFile.upload({}, function (err, result) {
-//                return res.status(400).send({error: 'error.file.type.wrong'});
-//            });
-//        }
+        //        if (_.indexOf(settings.allowedTypes, headers['content-type']) === -1) {
+        //            validated = false;
+        //            uploadFile.upload({}, function (err, result) {
+        //                return res.status(400).send({error: 'error.file.type.wrong'});
+        //            });
+        //        }
 
         // Validate file size
-//        if (byteCount > settings.maxBytes) {
-//            validated = false;
-//            uploadFile.upload({}, function (err, callback) {
-//                return res.status(400).send({error: "Upload limit of 10000000 bytes exceeded"});
-//                //return res.status(400).send({error: 'error.file.size.exceeded'});
-//            });
-//
-//        }
+        //        if (byteCount > settings.maxBytes) {
+        //            validated = false;
+        //            uploadFile.upload({}, function (err, callback) {
+        //                return res.status(400).send({error: "Upload limit of 10000000 bytes exceeded"});
+        //                //return res.status(400).send({error: 'error.file.size.exceeded'});
+        //            });
+        //
+        //        }
     } else {
         console.log("empty");
         validated = false;
-        uploadFile.upload({}, function (err, callback) {
-            return res.status(400).send({error: 'error.file.upload.empty'});
+        uploadFile.upload({}, function(err, callback) {
+            return res.status(400).send({
+                error: 'error.file.upload.empty'
+            });
         });
 
     }
@@ -65,15 +67,17 @@ function action_upload_files(req, res) {
                 key: 'AKIAJ57OGHEUSFKPWXMA',
                 secret: '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',
                 bucket: 'stay-on'
-            }, function (err, filesUploaded) {
+            }, function(err, filesUploaded) {
                 var resultArray = [];
                 if (err) return res.status(500).send(err);
 
                 else if (filesUploaded.length === 0) {
 
-                    return res.status(400).send({error: 'error.file.upload.empty'});
+                    return res.status(400).send({
+                        error: 'error.file.upload.empty'
+                    });
                 } else {
-                    _.each(filesUploaded, function (list, index) {
+                    _.each(filesUploaded, function(list, index) {
                         var data = {};
                         list.filetype = list.type;
                         list.org_filename = list.filename;
@@ -84,11 +88,10 @@ function action_upload_files(req, res) {
                         delete list.filename;
                         delete list.fd;
                         var media = new Media(list);
-                        media.save(function (err, media) {
-                            if(err || !media){
+                        media.save(function(err, media) {
+                            if (err || !media) {
                                 console.log(err);
-                            }
-                            else{
+                            } else {
                                 resultArray.push(media);
                                 if (index === filesUploaded.length - 1) {
                                     return res.json({
@@ -112,27 +115,34 @@ function action_upload_files(req, res) {
 }
 
 function action_list_files(req, res, next) {
-        console.log(req.query);
-        Media.find({},{}, { limit: req.query.limit ? req.query.limit : null,
-            sort: req.query.sort ? req.query.sort : "size",
-            skip: req.query.skip ? req.query.skip : null }, function (err, user) {
-            if (err) {
-                res.json(err);
-            } else {
-                res.json(user);
-            }
-        });
+    console.log(req.query);
+    Media.find({}, {}, {
+        limit: req.query.limit ? req.query.limit : null,
+        sort: req.query.sort ? req.query.sort : "size",
+        skip: req.query.skip ? req.query.skip : null
+    }, function(err, user) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(user);
+        }
+    });
 }
 
 function action_delete_file(req, res) {
-    if(!req.params.id){
-        return res.status(400).send({error: "fileid required"});
+    if (!req.params.id) {
+        return res.status(400).send({
+            error: "fileid required"
+        });
     }
-    Media.findByIdAndRemove(req.params.id, function (err, file) {
+    Media.findByIdAndRemove(req.params.id, function(err, file) {
         if (!err) {
-            res.send("successfully file deleted" + file);
-        }else{
-            res.send("error in removing user"+ err);
+            res.json({
+                "message": "successfully deleted"
+            });
+        } else {
+            res.json(err);
+            //res.send("error in removing user" + err);
         }
 
     });
@@ -140,5 +150,3 @@ function action_delete_file(req, res) {
 
 
 module.exports = router;
-
-
