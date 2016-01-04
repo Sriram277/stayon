@@ -16,6 +16,8 @@ router.post('/uploadfiles', action_upload_files);
 
 router.get('/list/files', action_list_files);
 
+router.get('/list/:filetype', action_list_filetype);
+
 router.delete('/file/:id', action_delete_file);
 
 function action_upload_files(req, res) {
@@ -79,7 +81,10 @@ function action_upload_files(req, res) {
                 } else {
                     _.each(filesUploaded, function(list, index) {
                         var data = {};
-                        list.filetype = list.type;
+                        var type = list.type;
+                        var filetype = type.split("/");
+                        list.filetype = filetype[0];
+                        list.srctype = list.type;
                         list.org_filename = list.filename;
                         list.location = list.extra.Location;
                         list.filename = list.fd;
@@ -128,6 +133,31 @@ function action_list_files(req, res, next) {
         }
     });
 }
+
+function action_list_filetype(req, res, next) {
+    if (!req.params.filetype) {
+        return res.status(400).send({
+            error: "fileType required"
+        });
+    }
+
+    Media.find({
+            'filetype': req.params.filetype
+        }, {}, {
+            limit: req.query.limit ? req.query.limit : null,
+            sort: req.query.sort ? req.query.sort : "size",
+            skip: req.query.skip ? req.query.skip : null
+        },
+        function(err, user) {
+            if (err) {
+                res.json(err);
+            } else {
+                res.json(user);
+            }
+        });
+}
+
+
 
 function action_delete_file(req, res) {
     if (!req.params.id) {
