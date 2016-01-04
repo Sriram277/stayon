@@ -15,6 +15,8 @@ router.delete('/delete/:id', action_remove_display);
 
 router.put('/edit/:id', action_edit_display);
 
+router.post('/upload/file', action_upload_file);
+
 function action_save_displays(req, res) {
     if (!req.body) {
         return res.status(400).send({
@@ -119,6 +121,68 @@ function action_edit_display(req, res) {
             // res.status(500).send("error in updating Request" + err);
         }
     });
+}
+
+function action_upload_file(req, res) {
+    var validated = true,
+        settings = {
+            allowedTypes: ['image/jpeg', 'image/png', 'image/jpg'],
+            maxBytes: 10 * 1024 * 1024
+        },
+        uploadFile = req.file('file');
+
+    if (uploadFile && uploadFile._files.length !== 0) {
+
+        var upload = uploadFile._files[0].stream,
+            headers = upload.headers,
+            byteCount = upload.byteCount
+    } else {
+        console.log("empty");
+        validated = false;
+        uploadFile.upload({}, function(err, callback) {
+            return res.status(400).send({
+                error: 'error.file.upload.empty'
+            });
+        });
+
+    }
+    if (validated) {
+        console.log("Started uploading...");
+        d.run(function safelyUpload() {
+            uploadFile.upload({
+                adapter: require('skipper-s3'),
+                key: 'AKIAJ57OGHEUSFKPWXMA',
+                secret: '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',
+                bucket: 'stay-on'
+            }, function(err, filesUploaded) {
+                var resultArray = [];
+                if (err) return res.status(500).send(err);
+
+                else if (filesUploaded.length === 0) {
+
+                    return res.status(400).send({
+                        error: 'error.file.upload.empty'
+                    });
+                } else {
+                    _.each(filesUploaded, function (list, index) {
+
+                        list.url = list.extra.Location;
+                        delete list.extra;
+
+                    });
+
+                    return res.ok({
+                        files: filesUploaded
+                    });
+
+
+                }
+
+
+            });
+        })
+
+    }
 }
 
 
