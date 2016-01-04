@@ -10,33 +10,40 @@ router.post('/save', action_save_device);
 
 router.get('/list/device', action_list_devices);
 
+
+router.get('/info/:key', action_get_device);
+
+
 router.delete('/delete/:id', action_remove_device);
 
 router.put('/edit/:id', action_edit_device);
 
 function action_save_device(req, res) {
-    if(!req.body){
-      return res.status(400).send({error:"body should not be empty"});
+    if (!req.body) {
+        return res.status(400).send({
+            error: "body should not be empty"
+        });
     }
     var deviceInfo = req.body;
     deviceInfo.random_key = randomstring.generate(8);
-// >> "xqm5wXX"
+    // >> "xqm5wXX"
 
     var device = new Device(deviceInfo);
-    device.save(function (err, device) {
+    device.save(function(err, device) {
         if (err || !device) {
             res.status(500).send(err);
-        }
-        else {
+        } else {
             return res.json(device);
         }
     });
 }
 
 function action_list_devices(req, res, next) {
-    Device.find({}, {}, { limit: req.query.limit ? req.query.limit : null,
+    Device.find({}, {}, {
+        limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
-        skip: req.query.skip ? req.query.skip : null }, function (err, device) {
+        skip: req.query.skip ? req.query.skip : null
+    }, function(err, device) {
         if (err) {
             res.json(err);
         } else {
@@ -47,9 +54,11 @@ function action_list_devices(req, res, next) {
 
 function action_remove_device(req, res) {
     if (!req.params.id) {
-        return res.status(400).send({error: "fileid required"});
+        return res.status(400).send({
+            error: "fileid required"
+        });
     }
-    Device.findByIdAndRemove(req.params.id, function (err, device) {
+    Device.findByIdAndRemove(req.params.id, function(err, device) {
         if (!err) {
             res.send("successfully file deleted" + device);
         } else {
@@ -59,8 +68,36 @@ function action_remove_device(req, res) {
     });
 }
 
-function action_edit_device(req, res){
-    Device.findOneAndUpdate({_id: req.params.id}, req.body, {upsert: true}, function (err, device) {
+function action_get_device(req, res) {
+    if (!req.params.key) {
+        return res.status(400).send({
+            error: "fileid required"
+        });
+    }
+    Device.findOne({
+        'random_key': req.params.key
+    }, {}, {
+        limit: req.query.limit ? req.query.limit : null,
+        sort: req.query.sort ? req.query.sort : "size",
+        skip: req.query.skip ? req.query.skip : null
+    }, function(err, device) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(device);
+        }
+    });
+
+
+}
+
+
+function action_edit_device(req, res) {
+    Device.findOneAndUpdate({
+        _id: req.params.id
+    }, req.body, {
+        upsert: true
+    }, function(err, device) {
         if (!err) {
             return res.status(200).send("Successfully Updated");
         } else {
@@ -71,5 +108,3 @@ function action_edit_device(req, res){
 
 
 module.exports = router;
-
-
