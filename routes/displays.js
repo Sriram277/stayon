@@ -16,32 +16,39 @@ router.delete('/delete/:id', action_remove_display);
 router.put('/edit/:id', action_edit_display);
 
 function action_save_displays(req, res) {
-    if(!req.body){
-        return res.status(400).send({error:"body should not be empty"});
+    if (!req.body) {
+        return res.status(400).send({
+            error: "body should not be empty"
+        });
     }
     var displays = req.body;
-    Device.findOne({random_key: displays.random_key}, function(err,deviceinfo){
-       if(err || !deviceinfo){
-           return res.status(500).send({error:"random_key not matched"});
-       }else{
-           var display = new Display(displays);
-           display.save(function (err, display) {
-               if (err || !display) {
-                   res.status(500).send(err);
-               }
-               else {
-                   return res.json(display);
-               }
-           });
-       }
+    Device.findOne({
+        random_key: displays.random_key
+    }, function(err, deviceinfo) {
+        if (err || !deviceinfo) {
+            return res.status(500).send({
+                error: "random_key not matched"
+            });
+        } else {
+            var display = new Display(displays);
+            display.save(function(err, display) {
+                if (err || !display) {
+                    res.status(500).send(err);
+                } else {
+                    return res.json(display);
+                }
+            });
+        }
     })
 
 }
 
 function action_list_displays(req, res, next) {
-    Display.find({}, {}, { limit: req.query.limit ? req.query.limit : null,
+    Display.find({}, {}, {
+        limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
-        skip: req.query.skip ? req.query.skip : null }, function (err, display) {
+        skip: req.query.skip ? req.query.skip : null
+    }, function(err, display) {
         if (err) {
             res.json(err);
         } else {
@@ -52,29 +59,64 @@ function action_list_displays(req, res, next) {
 
 function action_remove_display(req, res) {
     if (!req.params.id) {
-        return res.status(400).send({error: "fileid required"});
+        return res.status(400).send({
+            error: "fileid required"
+        });
     }
-    Display.findByIdAndRemove(req.params.id, function (err, display) {
-        if (!err) {
-            res.send("successfully file deleted" + display);
-        } else {
-            res.send("error in removing user" + err);
-        }
 
+    Display.findOne({
+        "_id": req.params.id
+    }, function(err, display) {
+        if (!err) {
+            Device.findOne({
+                "random_key": display.random_key
+            }, function(err, device) {
+                if (!err) {
+                    Device.findByIdAndRemove(device._id, function(err) {
+                        if (!err) {
+                            Display.findByIdAndRemove(req.params.id, function(err, display) {
+                                if (!err) {
+                                    res.json({
+                                        "message": "Successfully deleted"
+                                    });
+                                } else {
+                                    res.json(err);
+                                }
+                            });
+                        } else {
+                            console.log(err);
+                        }
+                    });
+                } else {
+                    console.log("blocked 2");
+                }
+            });
+        } else {
+            console.log("blocked 1");
+        }
     });
+
+
+
 }
 
-function action_edit_display(req, res){
-    Display.findOneAndUpdate({_id: req.params.id}, req.body, {upsert: true}, function (err, display) {
+function action_edit_display(req, res) {
+    Display.findOneAndUpdate({
+        _id: req.params.id
+    }, req.body, {
+        upsert: true
+    }, function(err, display) {
+        console.log(err);
+        console.log(display);
         if (!err) {
-            return res.status(200).send("Successfully Updated");
+            res.json(display);
+            // return res.status(200).send("Successfully Updated");
         } else {
-            res.status(500).send("error in updating Request" + err);
+            res.json(err);
+            // res.status(500).send("error in updating Request" + err);
         }
     });
 }
 
 
 module.exports = router;
-
-

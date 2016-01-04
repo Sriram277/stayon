@@ -30,7 +30,7 @@ function action_add_user(req, res) {
             error: "Body should not be empty"
         });
     }
-    if (reqBody.password) {
+    if (!reqBody.password) {
         return res.status(400).send({
             error: "Password is required"
         });
@@ -72,7 +72,7 @@ function loginuser(req, res) {
 
 function action_login_user(req, res) {
     User.findOne({
-        email: req.body.email,
+        username: req.body.username,
         password: req.body.password
     }, function(err, user) {
         if (err) {
@@ -83,9 +83,7 @@ function action_login_user(req, res) {
         } else {
             if (user) {
                 res.json({
-                    type: true,
-                    data: user,
-                    token: user.token
+                    "message": "success"
                 });
             } else {
                 res.json({
