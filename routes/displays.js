@@ -24,14 +24,17 @@ function action_save_displays(req, res) {
     var displays = req.body;
     Device.findOne({
         random_key: displays.random_key
-    }, function(err, deviceinfo) {
+    }, function (err, deviceinfo) {
         if (err || !deviceinfo) {
             return res.status(500).send({
                 error: "random_key not matched"
             });
         } else {
+            displays.device_info = deviceinfo.id;
             var display = new Display(displays);
-            display.save(function(err, display) {
+            display.save(function (err, display) {
+                console.log(err)
+                console.log(display);
                 if (err || !display) {
                     res.status(500).send(err);
                 } else {
@@ -48,13 +51,14 @@ function action_list_displays(req, res, next) {
         limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
         skip: req.query.skip ? req.query.skip : null
-    }, function(err, display) {
-        if (err) {
-            res.json(err);
-        } else {
-            res.json(display);
-        }
-    });
+    }).populate('device_info')
+        .exec(function (err, display) {
+            if (err) {
+                res.json(err);
+            } else {
+                res.json(display);
+            }
+        });
 }
 
 function action_remove_display(req, res) {
@@ -66,15 +70,15 @@ function action_remove_display(req, res) {
 
     Display.findOne({
         "_id": req.params.id
-    }, function(err, display) {
+    }, function (err, display) {
         if (!err) {
             Device.findOne({
                 "random_key": display.random_key
-            }, function(err, device) {
+            }, function (err, device) {
                 if (!err) {
-                    Device.findByIdAndRemove(device._id, function(err) {
+                    Device.findByIdAndRemove(device._id, function (err) {
                         if (!err) {
-                            Display.findByIdAndRemove(req.params.id, function(err, display) {
+                            Display.findByIdAndRemove(req.params.id, function (err, display) {
                                 if (!err) {
                                     res.json({
                                         "message": "Successfully deleted"
@@ -97,7 +101,6 @@ function action_remove_display(req, res) {
     });
 
 
-
 }
 
 function action_edit_display(req, res) {
@@ -105,7 +108,7 @@ function action_edit_display(req, res) {
         _id: req.params.id
     }, req.body, {
         upsert: true
-    }, function(err, display) {
+    }, function (err, display) {
         console.log(err);
         console.log(display);
         if (!err) {

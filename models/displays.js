@@ -9,6 +9,7 @@ module.exports = function (mongoose) {
             type: String,
             unique: true
         },
+        device_info: {type: Schema.ObjectId, ref: 'Device'},
         displayname: String,
         type: String,
         embbedcode:String,
