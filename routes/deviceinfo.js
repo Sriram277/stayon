@@ -13,6 +13,8 @@ router.get('/list/device', action_list_devices);
 
 router.get('/info/:key', action_get_device);
 
+router.get('/list/locations', action_get_locations);
+
 
 router.delete('/delete/:id', action_remove_device);
 
@@ -52,6 +54,20 @@ function action_list_devices(req, res, next) {
     });
 }
 
+
+function action_get_locations(req, res, next) {
+    Device.distinct('city', function(err, device) {
+       // console.log(device);
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(device);
+        }
+    });
+}
+
+
+
 function action_remove_device(req, res) {
     if (!req.params.id) {
         return res.status(400).send({
@@ -87,8 +103,6 @@ function action_get_device(req, res) {
             res.json(device);
         }
     });
-
-
 }
 
 
