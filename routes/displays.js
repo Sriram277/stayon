@@ -17,6 +17,8 @@ router.put('/edit/:id', action_edit_display);
 
 router.post('/upload/file', action_upload_file);
 
+router.get('/categories/:locations', action_get_categories);
+
 function action_save_displays(req, res) {
     if (!req.body) {
         return res.status(400).send({
@@ -26,7 +28,7 @@ function action_save_displays(req, res) {
     var displays = req.body;
     Device.findOne({
         random_key: displays.random_key
-    }, function (err, deviceinfo) {
+    }, function(err, deviceinfo) {
         if (err || !deviceinfo) {
             return res.status(500).send({
                 error: "random_key not matched"
@@ -34,7 +36,7 @@ function action_save_displays(req, res) {
         } else {
             displays.device_info = deviceinfo.id;
             var display = new Display(displays);
-            display.save(function (err, display) {
+            display.save(function(err, display) {
                 console.log(err)
                 console.log(display);
                 if (err || !display) {
@@ -45,16 +47,15 @@ function action_save_displays(req, res) {
             });
         }
     })
-
 }
 
 function action_list_displays(req, res, next) {
     Display.find({}, {}, {
-        limit: req.query.limit ? req.query.limit : null,
-        sort: req.query.sort ? req.query.sort : "size",
-        skip: req.query.skip ? req.query.skip : null
-    }).populate('device_info')
-        .exec(function (err, display) {
+            limit: req.query.limit ? req.query.limit : null,
+            sort: req.query.sort ? req.query.sort : "size",
+            skip: req.query.skip ? req.query.skip : null
+        }).populate('device_info')
+        .exec(function(err, display) {
             if (err) {
                 res.json(err);
             } else {
@@ -72,15 +73,15 @@ function action_remove_display(req, res) {
 
     Display.findOne({
         "_id": req.params.id
-    }, function (err, display) {
+    }, function(err, display) {
         if (!err) {
             Device.findOne({
                 "random_key": display.random_key
-            }, function (err, device) {
+            }, function(err, device) {
                 if (!err) {
-                    Device.findByIdAndRemove(device._id, function (err) {
+                    Device.findByIdAndRemove(device._id, function(err) {
                         if (!err) {
-                            Display.findByIdAndRemove(req.params.id, function (err, display) {
+                            Display.findByIdAndRemove(req.params.id, function(err, display) {
                                 if (!err) {
                                     res.json({
                                         "message": "Successfully deleted"
@@ -101,8 +102,6 @@ function action_remove_display(req, res) {
             console.log("blocked 1");
         }
     });
-
-
 }
 
 function action_edit_display(req, res) {
@@ -110,7 +109,7 @@ function action_edit_display(req, res) {
         _id: req.params.id
     }, req.body, {
         upsert: true
-    }, function (err, display) {
+    }, function(err, display) {
         console.log(err);
         console.log(display);
         if (!err) {
@@ -164,7 +163,7 @@ function action_upload_file(req, res) {
                         error: 'error.file.upload.empty'
                     });
                 } else {
-                    _.each(filesUploaded, function (list, index) {
+                    _.each(filesUploaded, function(list, index) {
 
                         list.url = list.extra.Location;
                         delete list.extra;
@@ -185,5 +184,38 @@ function action_upload_file(req, res) {
     }
 }
 
+function action_get_categories(req, res, next) {
+    console.log("this is test");
+
+    var cat_array = [];
+    var keys = [];
+    Device.find({
+        "city": req.params.locations
+    }, {
+        "random_key": 1,
+        "_id": 0
+    }, function(err, randomkeys) {
+        if (err) {
+            res.json(err);
+        } else {
+            _.each(randomkeys, function(list, index) {
+                keys.push(list.random_key);
+            });
+            if (keys.length != null)
+                console.log(keys);
+            Display.find({
+                "random_key": {
+                    $in: keys
+                }
+            }, {
+                "group": 1,
+                "_id": 0
+            }, function(err, categories) {
+                res.json(categories);
+            });
+
+        }
+    });
+}
 
 module.exports = router;
