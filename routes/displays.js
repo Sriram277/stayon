@@ -19,6 +19,8 @@ router.post('/upload/file', action_upload_file);
 
 router.get('/categories/:locations', action_get_categories);
 
+router.get('/displays/:cat_id', action_get_displays);
+
 function action_save_displays(req, res) {
     if (!req.body) {
         return res.status(400).send({
@@ -215,6 +217,18 @@ function action_get_categories(req, res, next) {
             });
 
         }
+    });
+}
+
+function action_get_displays(req, res, next) {
+
+    Display.find({
+        "group": req.params.cat_id
+    }, {
+        "display_name": 1,
+        "_id": 0
+    }, function(err, displays) {
+        res.json(displays);
     });
 }
 
