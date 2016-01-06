@@ -7,12 +7,11 @@ var Playlist = mongoose.model('Playlist');
 
 
 router.post('/save', action_save_playlist);
-
 router.get('/list/playlist', action_list_playlist);
-
 router.delete('/delete/:id', action_remove_playlist);
-
 router.put('/edit/:id', action_edit_playlist);
+
+
 
 function action_save_playlist(req, res) {
 
