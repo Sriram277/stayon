@@ -202,6 +202,7 @@ io.sockets.on('connection', function(socket) {
 
     //New Devices
     socket.on('newdisplay', function(data) {
+        console.log(data);
         var Display = mongoose.model('Display');
         Display.find({
             "random_key": data.sockitpin
@@ -210,7 +211,9 @@ io.sockets.on('connection', function(socket) {
         });
     });
 
-
+    socket.on('disconnect', function(data) {
+        console.log(clients);
+    });
 
     socket.on('pong', function(data) {
         console.log("Pong received from client(" + socket.id + ")");
