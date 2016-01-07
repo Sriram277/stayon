@@ -202,6 +202,7 @@ io.sockets.on('connection', function(socket) {
 
     //New Devices
     socket.on('newdisplay', function(data) {
+        console.log("1--- New Dissplay");
         console.log(data);
         var Display = mongoose.model('Display');
         Display.find({
@@ -212,7 +213,8 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function(data) {
-        console.log(clients);
+        console.log(data);
+        // console.log(clients);
     });
 
     socket.on('pong', function(data) {
