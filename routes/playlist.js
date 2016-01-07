@@ -64,9 +64,9 @@ function action_edit_playlist(req, res) {
         upsert: true
     }, function(err, playlist) {
         if (!err) {
-            return res.status(200).send("Successfully Updated");
+            return res.json(playlist);
         } else {
-            res.status(500).send("error in updating Request" + err);
+            res.json(err);
         }
     });
 }
