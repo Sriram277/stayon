@@ -213,16 +213,33 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('availableschedules', function(data) {
+        console.log("Schedules Loading");
+        console.log(data);
         var Schedular = mongoose.model('Schedular');
         console.log("Available Schedules");
+        console.log(data);
         Schedular.find({
             displays: {
                 "$in": [data.displayid]
             }
         }, function(err, schedular) {
-            console.log(schedular);
+            socket.emit("sendschedules", schedular);
         });
     });
+
+    socket.on('availablecampaigns', function(data) {
+        //FetchPlaylist
+        console.log("Playlist Loading");
+        console.log(data);
+        var Playlist = mongoose.model('Playlist');
+        Playlist.find({
+            "_id": data.playlistid
+        }, function(err, playlists) {
+            console.log(playlists);
+            socket.emit('sendcampaigns', playlists);
+        });
+    });
+
 
     socket.on('disconnect', function(data) {
         console.log(data);
