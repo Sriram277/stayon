@@ -212,14 +212,28 @@ io.sockets.on('connection', function(socket) {
         });
     });
 
+    socket.on('availableschedules', function(data) {
+        var Schedular = mongoose.model('Schedular');
+        console.log("Available Schedules");
+        Schedular.find({
+            displays: {
+                "$in": [data.displayid]
+            }
+        }, function(err, schedular) {
+            console.log(schedular);
+        });
+    });
+
     socket.on('disconnect', function(data) {
         console.log(data);
-        // console.log(clients);
     });
 
     socket.on('pong', function(data) {
         console.log("Pong received from client(" + socket.id + ")");
     });
+
+
+
 });
 
 setInterval(sendHeartbeat, 1000);
