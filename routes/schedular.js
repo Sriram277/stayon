@@ -15,6 +15,8 @@ router.delete('/delete/:id', action_delete_schedular);
 
 router.put('/edit/:id', action_edit_schedular);
 
+router.get('/get/:id' , action_getone_schedular);
+
 function action_save_schedular(req, res) {
     var reqBody = req.body;
     console.log(reqBody);
@@ -75,6 +77,16 @@ function action_edit_schedular(req, res) {
     });
 }
 
+function action_getone_schedular(req, res) {
+    var schedular_id = req.params.id;
+    Schedular.findOne({"_id" :  schedular_id} , function(err, schedular) {
+        if(err) {
+            res.json(err);
+        }else{
+            res.json(schedular);
+        }
+    });
+}
 
 module.exports = router;
 
