@@ -1,4 +1,6 @@
 var express = require('express');
+var global = require('../config/global.js');
+
 var router = express.Router();
 var _ = require('underscore');
 
@@ -39,11 +41,10 @@ function action_save_displays(req, res) {
             displays.device_info = deviceinfo.id;
             var display = new Display(displays);
             display.save(function(err, display) {
-                console.log(err)
-                console.log(display);
                 if (err || !display) {
                     res.status(500).send(err);
                 } else {
+                    global.clients[display.random_key].emit('displaycreated', display);
                     return res.json(display);
                 }
             });

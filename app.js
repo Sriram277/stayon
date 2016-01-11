@@ -32,6 +32,12 @@ var app = express();
 
 var port = normalizePort(process.env.PORT || '3000');
 
+var server = http.createServer(app);
+var global = require('./config/global.js');
+var io = require('socket.io')(server);
+global.io = io;
+io.set('transports', ['polling', 'websocket']);
+
 
 mongoose.connect('mongodb://localhost:27017/stay-on');
 
@@ -107,9 +113,7 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-var server = http.createServer(app);
-var io = require('socket.io')(server);
-io.set('transports', ['polling', 'websocket']);
+
 
 
 /**
@@ -178,26 +182,27 @@ function onListening() {
 
 /// Socket Connection:
 
-function sendHeartbeat() {
-    io.sockets.emit('ping', {
-        beat: 1
-    });
-}
+
 var devices = [];
-var clients = [];
+
 io.sockets.on('connection', function(socket) {
 
     socket.on('clientsocket', function(data) {
+        console.log("before---" + socket.id);
         this_user_id = data.sockitpin;
         socket.userid = this_user_id;
+        //socket.id = this_user_id;
+
         console.log(this_user_id, 'client id');
-        if (!(this_user_id in clients)) {
-            clients[this_user_id] = socket;
+        if (!(this_user_id in global.clients)) {
+            global.clients[this_user_id] = socket;
             console.log('client connected..');
         } else {
             console.log('client exist');
         };
-        clients[this_user_id].emit('heartbeat');
+        console.log("after---" + socket.id);
+        global.clients[this_user_id].emit('ping');
+
     });
 
     //New Devices
@@ -253,7 +258,17 @@ io.sockets.on('connection', function(socket) {
 
 });
 
-setInterval(sendHeartbeat, 1000);
+
+
+
+function sendHeartbeat() {
+    io.sockets.emit('ping', {
+        beat: 1
+    });
+}
+
+setInterval(sendHeartbeat, 80000);
+
 
 
 module.exports = app;
