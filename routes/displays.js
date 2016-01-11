@@ -1,4 +1,6 @@
 var express = require('express');
+var global = require('../config/global.js');
+
 var router = express.Router();
 var _ = require('underscore');
 
