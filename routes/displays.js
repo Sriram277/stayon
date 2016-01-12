@@ -20,6 +20,9 @@ router.put('/edit/:id', action_edit_display);
 
 router.post('/upload/file', action_upload_file);
 
+router.get('/list/locations', action_get_locations);
+
+
 router.get('/categories/:locations', action_get_categories);
 
 router.get('/category/:location', action_get_categories1);
@@ -73,6 +76,22 @@ function action_list_displays(req, res, next) {
             }
         });
 }
+
+
+function action_get_locations(req, res, next) {
+    Display.distinct('city', function(err, locations) {
+       // console.log(device);
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(locations);
+        }
+    });
+}
+
+
+
+
 
 function action_remove_display(req, res) {
     if (!req.params.id) {
