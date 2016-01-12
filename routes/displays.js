@@ -37,7 +37,7 @@ function action_save_displays(req, res) {
     var displays = req.body;
     Device.findOne({
         random_key: displays.random_key
-    }, function (err, deviceinfo) {
+    }, function(err, deviceinfo) {
         if (err || !deviceinfo) {
             return res.status(500).send({
                 error: "random_key not matched"
@@ -45,14 +45,14 @@ function action_save_displays(req, res) {
         } else {
             displays.device_info = deviceinfo.id;
             var display = new Display(displays);
-            display.save(function (err, display) {
+            display.save(function(err, display) {
                 console.log(err)
                 console.log(display);
                 if (err || !display) {
                     res.status(500).send(err);
                 } else {
-                    global.io.sockets.emit('displayadded', display);
-                    res.json(display);
+                    global.clients[display.random_key].emit('displaycreated', display);
+                    return res.json(display);
                 }
             });
         }
@@ -61,11 +61,11 @@ function action_save_displays(req, res) {
 
 function action_list_displays(req, res, next) {
     Display.find({}, {}, {
-        limit: req.query.limit ? req.query.limit : null,
-        sort: req.query.sort ? req.query.sort : "size",
-        skip: req.query.skip ? req.query.skip : null
-    }).populate('device_info')
-        .exec(function (err, display) {
+            limit: req.query.limit ? req.query.limit : null,
+            sort: req.query.sort ? req.query.sort : "size",
+            skip: req.query.skip ? req.query.skip : null
+        }).populate('device_info')
+        .exec(function(err, display) {
             if (err) {
                 res.json(err);
             } else {
@@ -83,15 +83,15 @@ function action_remove_display(req, res) {
 
     Display.findOne({
         "_id": req.params.id
-    }, function (err, display) {
+    }, function(err, display) {
         if (!err) {
             Device.findOne({
                 "random_key": display.random_key
-            }, function (err, device) {
+            }, function(err, device) {
                 if (!err) {
-                    Device.findByIdAndRemove(device._id, function (err) {
+                    Device.findByIdAndRemove(device._id, function(err) {
                         if (!err) {
-                            Display.findByIdAndRemove(req.params.id, function (err, display) {
+                            Display.findByIdAndRemove(req.params.id, function(err, display) {
                                 if (!err) {
                                     res.json({
                                         "message": "Successfully deleted"
@@ -119,7 +119,7 @@ function action_edit_display(req, res) {
         _id: req.params.id
     }, req.body, {
         upsert: true
-    }, function (err, display) {
+    }, function(err, display) {
         console.log(err);
         console.log(display);
         if (!err) {
@@ -148,7 +148,7 @@ function action_upload_file(req, res) {
     } else {
         console.log("empty");
         validated = false;
-        uploadFile.upload({}, function (err, callback) {
+        uploadFile.upload({}, function(err, callback) {
             return res.status(400).send({
                 error: 'error.file.upload.empty'
             });
@@ -163,7 +163,7 @@ function action_upload_file(req, res) {
                 key: 'AKIAJ57OGHEUSFKPWXMA',
                 secret: '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',
                 bucket: 'stay-on'
-            }, function (err, filesUploaded) {
+            }, function(err, filesUploaded) {
                 var resultArray = [];
                 if (err) return res.status(500).send(err);
 
@@ -173,7 +173,7 @@ function action_upload_file(req, res) {
                         error: 'error.file.upload.empty'
                     });
                 } else {
-                    _.each(filesUploaded, function (list, index) {
+                    _.each(filesUploaded, function(list, index) {
 
                         list.url = list.extra.Location;
                         delete list.extra;
@@ -204,11 +204,11 @@ function action_get_categories(req, res, next) {
     }, {
         "random_key": 1,
         "_id": 0
-    }, function (err, randomkeys) {
+    }, function(err, randomkeys) {
         if (err) {
             res.json(err);
         } else {
-            _.each(randomkeys, function (list, index) {
+            _.each(randomkeys, function(list, index) {
                 keys.push(list.random_key);
             });
             if (keys.length != null)
@@ -220,7 +220,7 @@ function action_get_categories(req, res, next) {
             }, {
                 "group": 1,
                 "_id": 0
-            }, function (err, categories) {
+            }, function(err, categories) {
                 res.json(categories);
             });
 
@@ -231,12 +231,16 @@ function action_get_categories(req, res, next) {
 function action_get_categories1(req, res, next) {
     console.log("this is test1");
 
-    Display.find({"city": req.params.location},{
+    Display.find({
+        "city": req.params.location
+    }, {
         "group": 1,
         "_id": 0
-    }, function (err, categories) {
-        if(categories){
-            res.json(_.uniq(categories, function(category) { return category.group; }));
+    }, function(err, categories) {
+        if (categories) {
+            res.json(_.uniq(categories, function(category) {
+                return category.group;
+            }));
         }
     });
 
@@ -249,7 +253,7 @@ function action_get_displays(req, res, next) {
     }, {
         "display_name": 1,
         "_id": 0
-    }, function (err, displays) {
+    }, function(err, displays) {
         res.json(displays);
     });
 }
@@ -258,12 +262,13 @@ function action_get_displays1(req, res, next) {
 
     console.log(req.params)
     Display.find({
-        "city": req.params.city,"group": req.params.cat_id
+        "city": req.params.city,
+        "group": req.params.cat_id
     }, {
         "display_name": 1,
         "random_key": 1,
         "_id": 0
-    }, function (err, displays) {
+    }, function(err, displays) {
         res.json(displays);
     });
 }
