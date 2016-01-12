@@ -5,9 +5,12 @@ module.exports = function(mongoose) {
     var schedularSchema = new Schema({
         userid: String,
         playlist_id: String,
+        location: String,
+        categories: String,
         assets_count: String,
         video_duration: String,
         start_time: String,
+        displays: Array,
         end_time: String,
         week_days: Array,
         created_on: {

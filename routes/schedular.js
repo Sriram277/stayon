@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var _ = require('underscore');
+var global = require('../config/global.js');
 
 var mongoose = require('mongoose');
 var Schedular = mongoose.model('Schedular');
@@ -29,7 +30,15 @@ function action_save_schedular(req, res) {
     	if(err) {
     		res.json(err);
     	}else {
-    		res.json(doc);
+            var displays =  reqBody.displays;
+            if(displays){
+                _.each(displays, function (display, index) {
+                    global.clients[display].emit('ping');
+                    if(displays.length = index +1){
+                        res.json(doc);
+                    }
+                });
+            }
     	}
     });
 }
