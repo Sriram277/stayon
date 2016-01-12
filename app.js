@@ -14,6 +14,7 @@ require('./models/displays')(mongoose)
 require('./models/device')(mongoose);
 require('./models/playlist')(mongoose);
 require('./models/schedular')(mongoose);
+require('./models/socketsink')(mongoose);
 
 
 var routes = require('./routes/index');
@@ -184,14 +185,25 @@ function onListening() {
 
 
 var devices = [];
+var Socketsink = mongoose.model('Socketsink');
+
 
 io.sockets.on('connection', function(socket) {
 
     socket.on('clientsocket', function(data) {
+        //var sockets = {};
+
         console.log("before---" + socket.id);
         this_user_id = data.sockitpin;
+        data.socketid = socket.id;
         socket.userid = this_user_id;
-        //socket.id = this_user_id;
+        socket.id = this_user_id;
+        
+        var socketsink = new Socketsink(data);
+
+        socketsink.save(function(err, sinking) {
+            console.log(sinking);
+        });
 
         console.log(this_user_id, 'client id');
         if (!(this_user_id in global.clients)) {

@@ -8,6 +8,7 @@ var mongoose = require('mongoose');
 var Display = mongoose.model('Display');
 var Device = mongoose.model('Device');
 
+var d = require('domain').create()
 
 router.post('/save', action_save_displays);
 
@@ -173,7 +174,7 @@ function action_upload_file(req, res) {
 
                     });
 
-                    return res.ok({
+                    return res.json({
                         files: filesUploaded
                     });
 
