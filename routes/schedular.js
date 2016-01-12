@@ -49,7 +49,8 @@ function action_save_schedular(req, res) {
                         "start_time": starttime,
                         "end_time": endtime,
                         "location": list.location,
-                        "filetype": list.filetype
+                        "filetype": list.filetype,
+                        "duration" : list.duration
                     });
                     starttime = new Date(starttime.getTime() + list.duration * 60 * 1000);
                     if (play_list.length === count + 1) {
