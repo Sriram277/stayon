@@ -38,6 +38,8 @@ function action_save_schedular(req, res) {
 
             var playerlist = [];
             finalObj.schedular_id = doc._id;
+            finalObj.start_time = doc.start_time;
+            finalObj.end_time   = doc.end_time;
             Playlist.findOne({
                 "_id": doc.playlist_id
             }, function(err, result) {
