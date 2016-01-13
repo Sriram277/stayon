@@ -206,15 +206,14 @@ io.sockets.on('connection', function(socket) {
         });
 
         console.log(this_user_id, 'client id');
-        if (!(this_user_id in global.clients)) {
-            global.clients[this_user_id] = socket;
-            console.log('client connected..');
-        } else {
+        //if (this_user_id in global.clients) {
+        global.clients[this_user_id] = socket;
+        console.log('client connected..');
+        /*} else {
             console.log('client exist');
-        };
+        };*/
+        //global.clients[this_user_id].emit('ping');
         console.log("after---" + socket.id);
-        global.clients[this_user_id].emit('ping');
-
     });
 
     //New Devices
@@ -257,10 +256,21 @@ io.sockets.on('connection', function(socket) {
         });
     });
 
+    socket.on('displaysync', function(data) {
+        console.log("displaysync acknowledged");
+        console.log(data);
+    });
+
+    socket.on('schedularsync', function(data) {
+        console.log('schedularsync acknowledged');
+        console.log(data);
+    });
+
 
     socket.on('disconnect', function(data) {
         console.log('disconnect');
         console.log(data);
+
     });
 
     socket.on('pong', function(data) {
