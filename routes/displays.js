@@ -54,8 +54,10 @@ function action_save_displays(req, res) {
                 if (err || !display) {
                     res.status(500).send(err);
                 } else {
-                    global.clients[display.random_key].emit('displaycreated', display);
-                    return res.json(display);
+                    res.json(display);
+                    if (global.clients[display.random_key]) {
+                        global.clients[display.random_key].emit('displaycreated', display);
+                    }
                 }
             });
         }
@@ -80,7 +82,7 @@ function action_list_displays(req, res, next) {
 
 function action_get_locations(req, res, next) {
     Display.distinct('city', function(err, locations) {
-       // console.log(device);
+        // console.log(device);
         if (err) {
             res.json(err);
         } else {
