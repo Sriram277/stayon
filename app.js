@@ -198,7 +198,7 @@ io.sockets.on('connection', function(socket) {
         data.socketid = socket.id;
         socket.userid = this_user_id;
         socket.id = this_user_id;
-        
+
         var socketsink = new Socketsink(data);
 
         socketsink.save(function(err, sinking) {
@@ -259,6 +259,7 @@ io.sockets.on('connection', function(socket) {
 
 
     socket.on('disconnect', function(data) {
+        console.log('disconnect');
         console.log(data);
     });
 
