@@ -250,8 +250,6 @@ function action_get_categories(req, res, next) {
 }
 
 function action_get_categories1(req, res, next) {
-    console.log("this is test1");
-
     Display.find({
         "city": req.params.location
     }, {
@@ -259,10 +257,13 @@ function action_get_categories1(req, res, next) {
         "_id": 0
     }, function(err, categories) {
         if (categories) {
-            res.json(_.uniq(categories, function(category) {
-                return category.group;
-            }));
+            res.json(unique(categories));
         }
+        /*   _.uniq(categories, function(item, key, group) {
+                console.log(item.group);
+            })
+            res.json(categories);
+        }*/
     });
 
 }
@@ -293,5 +294,29 @@ function action_get_displays1(req, res, next) {
         res.json(displays);
     });
 }
+
+
+
+function unique(obj) {
+    var uniques = [];
+    var stringify = {};
+    for (var i = 0; i < obj.length; i++) {
+        var keys = Object.keys(obj[i]);
+        keys.sort(function(a, b) {
+            return a - b
+        });
+        var str = '';
+        for (var j = 0; j < keys.length; j++) {
+            str += JSON.stringify(keys[j]);
+            str += JSON.stringify(obj[i][keys[j]]);
+        }
+        if (!stringify.hasOwnProperty(str)) {
+            uniques.push(obj[i]);
+            stringify[str] = true;
+        }
+    }
+    return uniques;
+}
+
 
 module.exports = router;
