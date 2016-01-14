@@ -48,8 +48,8 @@ function action_save_schedular(req, res) {
                     endtime = new Date(endtime.getTime() + list.duration * 60 * 1000);
                     //console.log(endtime + "---------" + list.duration);
                     playerlist.push({
-                        "start_time": starttime,
-                        "end_time": endtime,
+                        "start_time": doc.start_time,
+                        "end_time": doc.end_time,
                         "location": list.location,
                         "filetype": list.filetype,
                         "duration" : list.duration
