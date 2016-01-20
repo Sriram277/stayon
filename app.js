@@ -273,7 +273,13 @@ io.sockets.on('connection', function(socket) {
 
     });
 
-    socket.on('pong', function(data) {
+    socket.on('devicestatus' , function(data){
+        //same event for start time and end time also.
+        console.log(data);
+
+    });
+
+    socket.on('playerstatus', function(data) {
         console.log("Pong received from client(" + socket.id + ")");
     });
 
