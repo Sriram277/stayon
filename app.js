@@ -271,21 +271,48 @@ io.sockets.on('connection', function(socket) {
 
 
     socket.on('disconnect', function(data) {
+
         console.log('disconnect');
+        //Device Status update
+        var Device = mongoose.model('Device');
+        Device.findOneAndUpdate({
+            "random_key": socket.id
+        }, {
+            "player_onoff": "No"
+        }, {
+            upsert: true
+        }, function(err, statusupdated) {
+            console.log(statusupdated);
+        });
+
+        //PlayerStatus Tracking
+
+
+
         console.log(data);
 
     });
 
     socket.on('devicestatus', function(data) {
         //same event for start time and end time also.
-        console.log("devicestatus");
-        console.log(data);
 
+        var Device = mongoose.model('Device');
+        Device.findOneAndUpdate({
+            "random_key": data.sockitpin
+        }, {
+            "player_onoff": "Yes"
+        }, {
+            upsert: true
+        }, function(err, statusupdated) {
+            console.log("devicestatus");
+        });
     });
 
     socket.on('playerstatus', function(data) {
         console.log("playerstatus");
         console.log(data);
+
+
         console.log("Pong received from client(" + socket.id + ")");
     });
 
