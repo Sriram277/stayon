@@ -191,28 +191,22 @@ var Socketsink = mongoose.model('Socketsink');
 io.sockets.on('connection', function(socket) {
 
     socket.on('clientsocket', function(data) {
-        //var sockets = {};
 
+        //var sockets = {};
         console.log("before---" + socket.id);
         this_user_id = data.sockitpin;
         data.socketid = socket.id;
         socket.userid = this_user_id;
         socket.id = this_user_id;
 
-        var socketsink = new Socketsink(data);
-
-        socketsink.save(function(err, sinking) {
-            console.log(sinking);
+        Socketsink.findOneAndUpdate({
+            "sockitpin": data.sockitpin
+        }, data, {
+            upsert: true
+        }, function(err, socketsinkdata) {
+            global.clients[this_user_id] = socket;
+            console.log('client connected..');
         });
-
-        console.log(this_user_id, 'client id');
-        //if (this_user_id in global.clients) {
-        global.clients[this_user_id] = socket;
-        console.log('client connected..');
-        /*} else {
-            console.log('client exist');
-        };*/
-        //global.clients[this_user_id].emit('ping');
         console.log("after---" + socket.id);
     });
 
@@ -273,13 +267,15 @@ io.sockets.on('connection', function(socket) {
 
     });
 
-    socket.on('devicestatus' , function(data){
+    socket.on('devicestatus', function(data) {
         //same event for start time and end time also.
+        console.log("devicestatus");
         console.log(data);
 
     });
 
     socket.on('playerstatus', function(data) {
+        console.log("playerstatus");
         console.log("Pong received from client(" + socket.id + ")");
     });
 
