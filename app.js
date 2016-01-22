@@ -285,6 +285,7 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('playerstatus', function(data) {
         console.log("playerstatus");
+        console.log(data);
         console.log("Pong received from client(" + socket.id + ")");
     });
 
