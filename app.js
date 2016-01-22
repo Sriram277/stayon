@@ -35,9 +35,18 @@ var port = normalizePort(process.env.PORT || '3000');
 
 var server = http.createServer(app);
 var global = require('./config/global.js');
-var io = require('socket.io')(server);
+var options = {
+    pingTimeout: 3000,
+    pingInterval: 3000,
+    transports: ['polling', 'websocket'],
+    allowUpgrades: false,
+    cookie: false
+};
+
+
+var io = require('socket.io')(server, options);
 global.io = io;
-io.set('transports', ['polling', 'websocket']);
+//io.set('transports', ['polling', 'websocket']);
 
 
 mongoose.connect('mongodb://localhost:27017/stay-on');
