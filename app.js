@@ -217,11 +217,20 @@ io.sockets.on('connection', function(socket) {
             console.log('client connected..');
         });
         console.log("after---" + socket.id);
+
+        var Display = mongoose.model('Display');
+        Display.findOne({
+            "random_key": this_user_id
+        }, function(err, display) {
+            if (display.devicesync == "false") {
+                global.clients[this_user_id].emit('editdisplay_updated', displays);
+            }
+        });
     });
 
     //New Devices
     socket.on('newdisplay', function(data) {
-        console.log("1--- New Dissplay");
+        console.log("1--- New Display");
         console.log(data);
         var Display = mongoose.model('Display');
         Display.find({
@@ -260,6 +269,18 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('displaysync', function(data) {
+
+        //Make displays.devicesync = "true" becoz data syncronized;
+        var Display = mongoose.model('Display');
+        Display.findOneAndUpdate({
+            "random_key": data.sockitpin
+        }, {
+            "devicesync": "true"
+        }, {
+            upsert: true
+        }, function(err, statusupdated) {
+            console.log(statusupdated);
+        });
         console.log("displaysync acknowledged");
         console.log(data);
     });
@@ -286,11 +307,7 @@ io.sockets.on('connection', function(socket) {
         });
 
         //PlayerStatus Tracking
-
-
-
         console.log(data);
-
     });
 
     socket.on('devicestatus', function(data) {

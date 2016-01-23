@@ -47,6 +47,7 @@ function action_save_displays(req, res) {
             });
         } else {
             displays.device_info = deviceinfo.id;
+            displays.devicesync = "false";
             var display = new Display(displays);
             display.save(function(err, display) {
                 console.log(err)
@@ -144,11 +145,12 @@ function action_edit_display(req, res) {
         console.log(err);
         console.log(display);
         if (!err) {
+            if (global.clients[display.random_key]) {
+                global.clients[display.random_key].emit('editdisplay_updated', display);
+            }
             res.json(display);
-            // return res.status(200).send("Successfully Updated");
         } else {
             res.json(err);
-            // res.status(500).send("error in updating Request" + err);
         }
     });
 }
