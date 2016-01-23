@@ -15,6 +15,7 @@ require('./models/device')(mongoose);
 require('./models/playlist')(mongoose);
 require('./models/schedular')(mongoose);
 require('./models/socketsink')(mongoose);
+require('./models/trackstatus')(mongoose);
 
 
 var routes = require('./routes/index');
@@ -195,7 +196,9 @@ function onListening() {
 
 var devices = [];
 var Socketsink = mongoose.model('Socketsink');
-
+var TrackStatus = mongoose.model('TrackStatus');
+var Device = mongoose.model('Device');
+var Display = mongoose.model('Display');
 
 io.sockets.on('connection', function(socket) {
 
@@ -218,7 +221,6 @@ io.sockets.on('connection', function(socket) {
         });
         console.log("after---" + socket.id);
 
-        var Display = mongoose.model('Display');
         Display.findOne({
             "random_key": this_user_id
         }, function(err, display) {
@@ -226,13 +228,23 @@ io.sockets.on('connection', function(socket) {
                 global.clients[this_user_id].emit('editdisplay_updated', displays);
             }
         });
+
+        var trackdata = {};
+        trackdata.modeltype = "device";
+        trackdata.currentstatus = "started";
+        trackdata.random_key = this_user_id;
+        var track = new TrackStatus(trackdata);
+        track.save(function(err, tracked) {
+            console.log("Tracked");
+        });
+
     });
 
     //New Devices
     socket.on('newdisplay', function(data) {
         console.log("1--- New Display");
         console.log(data);
-        var Display = mongoose.model('Display');
+
         Display.find({
             "random_key": data.sockitpin
         }, function(err, displays) {
@@ -271,7 +283,7 @@ io.sockets.on('connection', function(socket) {
     socket.on('displaysync', function(data) {
 
         //Make displays.devicesync = "true" becoz data syncronized;
-        var Display = mongoose.model('Display');
+        //var Display = mongoose.model('Display');
         Display.findOneAndUpdate({
             "random_key": data.sockitpin
         }, {
@@ -293,9 +305,7 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('disconnect', function(data) {
 
-        console.log('disconnect');
         //Device Status update
-        var Device = mongoose.model('Device');
         Device.findOneAndUpdate({
             "random_key": socket.id
         }, {
@@ -303,17 +313,22 @@ io.sockets.on('connection', function(socket) {
         }, {
             upsert: true
         }, function(err, statusupdated) {
-            console.log(statusupdated);
+            console.log("Device Player Status Updated");
         });
 
-        //PlayerStatus Tracking
-        console.log(data);
+        var trackdata = {};
+        trackdata.modeltype = "device";
+        trackdata.currentstatus = "stopped";
+        trackdata.random_key = socket.id;
+        var track = new TrackStatus(trackdata);
+        track.save(function(err, tracked) {
+            console.log("Disconnect Socket for " + socket.id);
+        });
     });
 
     socket.on('devicestatus', function(data) {
         //same event for start time and end time also.
 
-        var Device = mongoose.model('Device');
         Device.findOneAndUpdate({
             "random_key": data.sockitpin
         }, {
@@ -328,13 +343,15 @@ io.sockets.on('connection', function(socket) {
     socket.on('playerstatus', function(data) {
         console.log("playerstatus");
         console.log(data);
-
-
-        console.log("Pong received from client(" + socket.id + ")");
+        var trackdata = {};
+        trackdata.modeltype = "Player";
+        trackdata.currentstatus = "started";
+        trackdata.random_key = this_user_id;
+        var track = new TrackStatus(trackdata);
+        track.save(function(err, tracked) {
+            console.log("Player status");
+        });
     });
-
-
-
 });
 
 
