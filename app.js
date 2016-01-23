@@ -26,6 +26,7 @@ var display = require('./routes/displays');
 var device = require('./routes/deviceinfo');
 var playlist = require('./routes/playlist');
 var schedular = require('./routes/schedular');
+var testupload = require('./routes/testupload');
 
 var debug = require('debug')('stayon:server');
 var http = require('http');
@@ -92,6 +93,7 @@ app.use('/display', display);
 app.use('/device', device);
 app.use('/playlist', playlist);
 app.use('/schedular', schedular);
+app.use('/testupload', testupload);
 
 
 // catch 404 and forward to error handler
