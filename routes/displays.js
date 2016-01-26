@@ -47,7 +47,7 @@ function action_save_displays(req, res) {
             });
         } else {
             displays.device_info = deviceinfo.id;
-            displays.devicesync = "false";
+            //displays.devicesync = "false";
             var display = new Display(displays);
             display.save(function(err, display) {
                 console.log(err)
