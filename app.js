@@ -226,8 +226,11 @@ io.sockets.on('connection', function(socket) {
         Display.findOne({
             "random_key": this_user_id
         }, function(err, display) {
-            if (display.devicesync == "false") {
-                global.clients[this_user_id].emit('editdisplay_updated', displays);
+            console.log(display);
+            if (display) {
+                if (display.devicesync == "false") {
+                    global.clients[this_user_id].emit('editdisplay_updated', display);
+                }
             }
         });
 
@@ -307,6 +310,7 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('disconnect', function(data) {
 
+        console.log(data);
         //Device Status update
         Device.findOneAndUpdate({
             "random_key": socket.id
@@ -330,7 +334,7 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('devicestatus', function(data) {
         //same event for start time and end time also.
-
+        console.log(data);
         Device.findOneAndUpdate({
             "random_key": data.sockitpin
         }, {
