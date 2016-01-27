@@ -145,8 +145,10 @@ function action_edit_display(req, res) {
         console.log(err);
         console.log(display);
         if (!err) {
-            if (global.clients[display.random_key]) {
-                global.clients[display.random_key].emit('editdisplay_updated', display);
+            if (display) {
+                if (global.clients[display.random_key]) {
+                    global.clients[display.random_key].emit('editdisplay_updated', display);
+                }
             }
             res.json(display);
         } else {

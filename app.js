@@ -287,7 +287,7 @@ io.sockets.on('connection', function(socket) {
         //Make displays.devicesync = "true" becoz data syncronized;
         //var Display = mongoose.model('Display');
         Display.findOneAndUpdate({
-            "random_key": data.sockitpin
+            "random_key": data.socketid
         }, {
             "devicesync": "true"
         }, {
