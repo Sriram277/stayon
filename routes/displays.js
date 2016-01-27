@@ -27,6 +27,8 @@ router.get('/categories/:locations', action_get_categories);
 
 router.get('/category/:location', action_get_categories1);
 
+router.get('/category', fetch_categories);
+
 router.get('/displays/:cat_id', action_get_displays);
 
 router.get('/displays/:city/:cat_id', action_get_displays1);
@@ -80,7 +82,6 @@ function action_list_displays(req, res, next) {
         });
 }
 
-
 function action_get_locations(req, res, next) {
     Display.distinct('city', function(err, locations) {
         // console.log(device);
@@ -91,10 +92,6 @@ function action_get_locations(req, res, next) {
         }
     });
 }
-
-
-
-
 
 function action_remove_display(req, res) {
     if (!req.params.id) {
@@ -145,8 +142,10 @@ function action_edit_display(req, res) {
         console.log(err);
         console.log(display);
         if (!err) {
-            if (global.clients[display.random_key]) {
-                global.clients[display.random_key].emit('editdisplay_updated', display);
+            if (display) {
+                if (global.clients[display.random_key]) {
+                    global.clients[display.random_key].emit('editdisplay_updated', display);
+                }
             }
             res.json(display);
         } else {
@@ -267,7 +266,18 @@ function action_get_categories1(req, res, next) {
             res.json(categories);
         }*/
     });
+}
 
+function fetch_categories(req, res, next) {
+    Display.find({}, {
+        "group": 1,
+        "_id": 0
+    }, function(err, categories) {
+        if (categories) {
+            res.json(unique(categories));
+        }
+
+    });
 }
 
 function action_get_displays(req, res, next) {

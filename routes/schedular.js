@@ -39,7 +39,7 @@ function action_save_schedular(req, res) {
             var playerlist = [];
             finalObj.schedular_id = doc._id;
             finalObj.start_time = doc.start_time;
-            finalObj.end_time   = doc.end_time;
+            finalObj.end_time = doc.end_time;
             Playlist.findOne({
                 "_id": doc.playlist_id
             }, function(err, result) {
@@ -52,7 +52,7 @@ function action_save_schedular(req, res) {
                         "end_time": doc.end_time,
                         "location": list.location,
                         "filetype": list.filetype,
-                        "duration" : list.duration
+                        "duration": list.duration
                     });
                     starttime = new Date(starttime.getTime() + list.duration * 60 * 1000);
                     if (play_list.length === count + 1) {
@@ -62,8 +62,8 @@ function action_save_schedular(req, res) {
                         var displays = reqBody.displays;
                         if (displays) {
                             _.each(displays, function(display, index) {
-                                console.log(display);
                                 if (global.clients[display]) {
+                                    console.log(display);
                                     global.clients[display].emit('scheduledlist', finalObj);
                                 }
                                 // if (displays.length = index + 1) {
