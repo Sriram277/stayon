@@ -15,6 +15,10 @@ router.get('/list', action_list_schedular);
 
 router.get('/list/:locations' , fetch_loc_schedulars);
 
+router.get('/list/:locations/:categories' , fetch_loc_cat_schedulars);
+
+router.get('/list/:locations/:categories/:displays' , fetch_loc_cat_disp_schedulars);
+
 router.delete('/delete/:id', action_delete_schedular);
 
 router.put('/edit/:id', action_edit_schedular);
@@ -120,9 +124,39 @@ function fetch_loc_schedulars(req, res, next){
             res.json(schedular);
         }
     });
-
-
 }
+
+
+function fetch_loc_cat_schedulars(req, res, next){
+
+     Schedular.find({ "locations" :  req.params.locations , "categories" : req.params.categories}, {}, {
+        limit: req.query.limit ? req.query.limit : null,
+        sort: req.query.sort ? req.query.sort : "size",
+        skip: req.query.skip ? req.query.skip : null
+    }, function(err, schedular) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(schedular);
+        }
+    });
+}
+
+function fetch_loc_cat_disp_schedulars(req, res, next){
+
+     Schedular.find({ "locations" :  req.params.locations , "categories" : req.params.categories}, {}, {
+        limit: req.query.limit ? req.query.limit : null,
+        sort: req.query.sort ? req.query.sort : "size",
+        skip: req.query.skip ? req.query.skip : null
+    }, function(err, schedular) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(schedular);
+        }
+    });
+}
+
 
 function action_list_schedular(req, res, next) {
     Schedular.find({}, {}, {
