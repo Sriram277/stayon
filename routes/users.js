@@ -19,6 +19,7 @@ router.get('/list', function(req, res, next) {
 router.post('/register', action_add_user);
 router.post('/login', action_login_user);
 router.post('/register', action_register_user);
+router.post('/changepassword/:id', action_changepwd_user);
 router.get('/me', auth.ensureAuthorized, action_register_user);
 
 
@@ -66,8 +67,6 @@ function loginuser(req, res) {
     }, function(err, doc) {
         console.log(doc);
     });
-
-
 }
 
 function action_login_user(req, res) {
@@ -127,11 +126,24 @@ function action_register_user(req, res) {
             }
         }
     });
-
 }
 
 function me(req, res) {
     console.log("me");
+}
+
+function action_changepwd_user(req, res) {
+    User.findOneAndUpdate({
+        "_id": req.params.id
+    }, {
+        "password": req.body.password
+    }, {
+        upsert: true
+    }, function(err, user) {
+        res.json({
+            "msg": "Password changed Successfully"
+        });
+    });
 }
 
 module.exports = router;
