@@ -120,18 +120,23 @@ function action_upload_files(req, res) {
 }
 
 function action_list_files(req, res, next) {
-    console.log(req.query);
+    
+    var data = {};
+    Media.count({}, function(err, c) {
     Media.find({}, {}, {
         limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
         skip: req.query.skip ? req.query.skip : null
-    }, function(err, user) {
+    }, function(err, media) {
         if (err) {
             res.json(err);
         } else {
-            res.json(user);
+              data.count = c;
+              data.media = media;
+            res.json(data);
         }
     });
+});
 }
 
 function action_list_filetype(req, res, next) {

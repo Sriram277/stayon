@@ -68,7 +68,9 @@ function action_save_displays(req, res) {
 }
 
 function action_list_displays(req, res, next) {
-    Display.find({}, {}, {
+    var data = {};
+    Display.count({}, function(err, c) {
+        Display.find({}, {}, {
             limit: req.query.limit ? req.query.limit : null,
             sort: req.query.sort ? req.query.sort : "size",
             skip: req.query.skip ? req.query.skip : null
@@ -77,9 +79,12 @@ function action_list_displays(req, res, next) {
             if (err) {
                 res.json(err);
             } else {
-                res.json(display);
+                data.count = c;
+                data.display = display;
+                res.json(data);
             }
         });
+    }); 
 }
 
 function action_get_locations(req, res, next) {
