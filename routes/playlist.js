@@ -38,7 +38,7 @@ function action_list_playlist(req, res, next) {
             } else {
                 data.count = c;
                 data.playlist = playlist;
-                res.json(playlist);
+                res.json(data);
             }
         });
     });
