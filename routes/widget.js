@@ -28,15 +28,20 @@ function action_save_widgets(req, res) {
 }
 
 function action_list_widgets(req, res, next) {
+    var data = {};
+    Widget.count({}, function(err, c) {
     Widget.find({}, {}, { limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
         skip: req.query.skip ? req.query.skip : null }, function (err, widget) {
         if (err) {
             res.json(err);
         } else {
-            res.json(widget);
+            data.count =c;
+            data.widget = widget;
+            res.json(data);
         }
     });
+ });
 }
 
 function action_remove_widget(req, res) {
