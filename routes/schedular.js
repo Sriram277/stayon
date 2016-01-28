@@ -112,7 +112,7 @@ function action_save_schedular(req, res) {
 // }
 
 function fetch_loc_schedulars(req, res, next){
-
+console.log("i m in first");
      Schedular.find({ "locations" :  req.params.locations}, {}, {
         limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
@@ -128,7 +128,7 @@ function fetch_loc_schedulars(req, res, next){
 
 
 function fetch_loc_cat_schedulars(req, res, next){
-
+    console.log("i m in second");
      Schedular.find({ "locations" :  req.params.locations , "categories" : req.params.categories}, {}, {
         limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
@@ -143,8 +143,9 @@ function fetch_loc_cat_schedulars(req, res, next){
 }
 
 function fetch_loc_cat_disp_schedulars(req, res, next){
-
-     Schedular.find({ "locations" :  req.params.locations , "categories" : req.params.categories}, {}, {
+        console.log("I m  third");
+        console.log(req.params);
+     Schedular.find({ "locations" :  req.params.locations , "categories" : req.params.categories , "displays" : {"$in" : [req.params.displays]}}, {}, {
         limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
         skip: req.query.skip ? req.query.skip : null
