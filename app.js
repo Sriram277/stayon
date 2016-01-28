@@ -46,7 +46,7 @@ var options = {
 };
 
 
-var io = require('socket.io')(server, options);
+var io = require('socket.io')(server);
 global.io = io;
 //io.set('transports', ['polling', 'websocket']);
 
