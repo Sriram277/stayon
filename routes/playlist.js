@@ -28,18 +28,19 @@ function action_save_playlist(req, res) {
 function action_list_playlist(req, res, next) {
         var data = {};
     Playlist.count({}, function(err, c) {
-    Playlist.find({}, {}, {
-        limit: req.query.limit ? req.query.limit : null,
-        sort: req.query.sort ? req.query.sort : "size",
-        skip: req.query.skip ? req.query.skip : null
-    }, function(err, playlist) {
-        if (err) {
-            res.json(err);
-        } else {
-            data.count = c;
-            data.playlist = playlist;
-            res.json(playlist);
-        }
+        Playlist.find({}, {}, {
+            limit: req.query.limit ? req.query.limit : null,
+            sort: req.query.sort ? req.query.sort : "size",
+            skip: req.query.skip ? req.query.skip : null
+        }, function(err, playlist) {
+            if (err) {
+                res.json(err);
+            } else {
+                data.count = c;
+                data.playlist = playlist;
+                res.json(playlist);
+            }
+        });
     });
 }
 
