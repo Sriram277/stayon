@@ -21,16 +21,16 @@ router.put('/edit/:id', action_edit_display);
 router.post('/upload/file', action_upload_file);
 
 router.get('/list/locations', action_get_locations);
+router.get('/category', fetch_categories);
+
 
 
 router.get('/categories/:locations', action_get_categories);
-
 router.get('/category/:location', action_get_categories1);
 
-router.get('/category', fetch_categories);
+
 
 router.get('/displays/:cat_id', action_get_displays);
-
 router.get('/displays/:city/:cat_id', action_get_displays1);
 
 function action_save_displays(req, res) {
@@ -256,20 +256,21 @@ function action_get_categories(req, res, next) {
 }
 
 function action_get_categories1(req, res, next) {
-    Display.find({
-        "city": req.params.location
-    }, {
+
+    var city = {};
+    if(req.params.location == 'all') {
+        console.log(null);
+    }else {
+        city.city = req.params.location;
+    }
+    console.log(city);
+    Display.find(city, {
         "group": 1,
         "_id": 0
     }, function(err, categories) {
         if (categories) {
             res.json(unique(categories));
         }
-        /*   _.uniq(categories, function(item, key, group) {
-                console.log(item.group);
-            })
-            res.json(categories);
-        }*/
     });
 }
 
@@ -298,12 +299,18 @@ function action_get_displays(req, res, next) {
 }
 
 function action_get_displays1(req, res, next) {
+    var searchObj;
 
-    console.log(req.params)
-    Display.find({
-        "city": req.params.city,
-        "group": req.params.cat_id
-    }, {
+   if(req.params.city == 'all' && req.params.cat_id == 'all'){
+        searchObj = {};
+   }else if(req.params.city != 'all' && req.params.cat_id == 'all'){
+        searchObj = { "city": req.params.city };
+   }else if(req.params.city != 'all' && req.params.cat_id != 'all'){
+        searchObj = { "city": req.params.city , "group" : req.params.cat_id };
+   }else if(req.params.city == 'all' && req.params.cat_id != 'all'){
+        searchObj = { "group" : req.params.cat_id };
+   }
+    Display.find(searchObj, {
         "display_name": 1,
         "random_key": 1,
         "_id": 0
