@@ -59,7 +59,9 @@ function action_save_displays(req, res) {
                     "city" : req.body.city,
                     "state" : req.body.state,
                     "latitude" : req.body.latitude,
-                    "longitude":req.body.longitude
+                    "longitude":req.body.longitude,
+                    "postal_code" : req.body.postal_code,
+                    "country" : req.body.country
                 }, function(err, location){
                     displays.device_info = deviceinfo.id;
                     displays.group = category.id;
@@ -69,6 +71,7 @@ function action_save_displays(req, res) {
                     displays.random_key =req.body.random_key;
                     displays.layout_id = req.body.layout_id;
                     displays.devicesync = req.body.devicesync;
+                    displays.location_photo = req.body.location_photo;
                     var display = new Display(displays);
                     display.save(function(err, display) {
                         console.log(err)
@@ -288,12 +291,12 @@ function action_get_categories1(req, res, next) {
         city.city = req.params.location;
     }
     console.log(city);
-    Display.find(city, {
-        "group": 1,
-        "_id": 0
+    Locations.find(city, {
+        "group": 0,
+        "_id": 1
     }, function(err, categories) {
         if (categories) {
-            res.json(unique(categories));
+            res.json(categories);
         }
     });
 }
