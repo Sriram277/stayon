@@ -7,8 +7,11 @@ var _ = require('underscore');
 var mongoose = require('mongoose');
 var Display = mongoose.model('Display');
 var Device = mongoose.model('Device');
+var Locations = mongoose.model('Locations');
+var Categories = mongoose.model('Categories');
 
-var d = require('domain').create()
+
+var d = require('domain').create();
 
 router.post('/save', action_save_displays);
 
@@ -39,29 +42,47 @@ function action_save_displays(req, res) {
             error: "body should not be empty"
         });
     }
-    var displays = req.body;
+    var displays = {};
     Device.findOne({
-        random_key: displays.random_key
+        random_key: req.body.random_key
     }, function(err, deviceinfo) {
         if (err || !deviceinfo) {
             return res.status(500).send({
                 error: "random_key not matched"
             });
         } else {
-            displays.device_info = deviceinfo.id;
-            //displays.devicesync = "false";
-            var display = new Display(displays);
-            display.save(function(err, display) {
-                console.log(err)
-                console.log(display);
-                if (err || !display) {
-                    res.status(500).send(err);
-                } else {
-                    res.json(display);
-                    if (global.clients[display.random_key]) {
-                        global.clients[display.random_key].emit('displaycreated', display);
-                    }
-                }
+
+            Categories.findOrCreate({
+                "category_name" : req.body.group
+            }, function(err, category){
+                Locations.findOrCreate({
+                    "city" : req.body.city,
+                    "state" : req.body.state,
+                    "latitude" : req.body.latitude,
+                    "longitude":req.body.longitude
+                }, function(err, location){
+                    displays.device_info = deviceinfo.id;
+                    displays.group = category.id;
+                    displays.locationId = location.id;
+                    displays.display_name = req.body.display_name;
+                    displays.orientation = req.body.orientation;
+                    displays.random_key =req.body.random_key;
+                    displays.layout_id = req.body.layout_id;
+                    displays.devicesync = req.body.devicesync;
+                    var display = new Display(displays);
+                    display.save(function(err, display) {
+                        console.log(err)
+                        console.log(display);
+                        if (err || !display) {
+                            res.status(500).send(err);
+                        } else {
+                            res.json(display);
+                            if (global.clients[display.random_key]) {
+                                global.clients[display.random_key].emit('displaycreated', display);
+                            }
+                        }
+                    });
+                });
             });
         }
     })

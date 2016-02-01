@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var findOrCreate = require('mongoose-findorcreate');
 
 
 require('./models/user')(mongoose);
@@ -16,6 +17,8 @@ require('./models/playlist')(mongoose);
 require('./models/schedular')(mongoose);
 require('./models/socketsink')(mongoose);
 require('./models/trackstatus')(mongoose);
+require('./models/locations')(mongoose);
+require('./models/categories')(mongoose);
 
 
 var routes = require('./routes/index');
