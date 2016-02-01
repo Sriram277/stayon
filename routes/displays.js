@@ -109,7 +109,10 @@ function action_list_displays(req, res, next) {
 }
 
 function action_get_locations(req, res, next) {
-    Display.distinct('city', function(err, locations) {
+    Locations.find('city', {
+                "city": 1,
+                "_id": 0
+            }, function(err, locations) {
         // console.log(device);
         if (err) {
             res.json(err);
@@ -296,12 +299,12 @@ function action_get_categories1(req, res, next) {
 }
 
 function fetch_categories(req, res, next) {
-    Display.find({}, {
-        "group": 1,
+    Categories.find({}, {
+        "category_name": 1,
         "_id": 0
     }, function(err, categories) {
         if (categories) {
-            res.json(unique(categories));
+            res.json(categories);
         }
 
     });
