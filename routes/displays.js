@@ -114,7 +114,7 @@ function action_list_displays(req, res, next) {
 function action_get_locations(req, res, next) {
     Locations.find('city', {
                 "city": 1,
-                "_id": 0
+                "_id": 1
             }, function(err, locations) {
         // console.log(device);
         if (err) {
@@ -292,7 +292,7 @@ function action_get_categories1(req, res, next) {
     }
     console.log(city);
     Locations.find(city, {
-        "group": 0,
+        "city": 1,
         "_id": 1
     }, function(err, categories) {
         if (categories) {
