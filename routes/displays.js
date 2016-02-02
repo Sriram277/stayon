@@ -25,6 +25,7 @@ router.get('/category', fetch_categories);
 
 router.post('/locations/categories', action_loc_categories);
 
+router.post('/loc/cat/displays' , action_loc_cat_displays);
 
 
 router.get('/categories/:locations', action_get_categories);
@@ -97,7 +98,7 @@ function action_list_displays(req, res, next) {
                 limit: req.query.limit ? req.query.limit : null,
                 sort: req.query.sort ? req.query.sort : "size",
                 skip: req.query.skip ? req.query.skip : null
-            }).populate('device_info').populate('locations')
+            }).populate('categories')
             .exec(function(err, display) {
                 if (err) {
                     res.json(err);
@@ -375,6 +376,23 @@ function action_loc_categories(req, res) {
         },function(err, categories){
             res.json(categories);
         })
+    });
+}
+
+function action_loc_cat_displays(req, res){
+
+    Display.find({
+        "locationId": {
+            $in: req.body.city
+        }, "group" : {
+            $in : req.body.group
+        }
+    }, {
+        "display_name": 1,
+        "_id": 1
+    }, function(err, displays) {
+        res.json(displays);
+        //console.log(_.pluck(groups, 'group'));
     });
 }
 

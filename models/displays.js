@@ -19,7 +19,14 @@ module.exports = function(mongoose) {
         displayname: String,
         type: String,
         embbedcode: String,
-        group:String,
+        group: {
+            type: Schema.ObjectId,
+            ref: 'Categories'
+        },
+        locationId:{
+             type: Schema.ObjectId,
+            ref: 'Locations'
+        },
         settings: {
             type: Object
         },
