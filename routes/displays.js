@@ -14,19 +14,15 @@ var Categories = mongoose.model('Categories');
 var d = require('domain').create();
 
 router.post('/save', action_save_displays);
-
 router.get('/list/displays', action_list_displays);
-
 router.delete('/delete/:id', action_remove_display);
-
 router.put('/edit/:id', action_edit_display);
-
 router.post('/upload/file', action_upload_file);
 
 router.get('/list/locations', action_get_locations);
 router.get('/category', fetch_categories);
 
-
+router.post('/locations/categories', action_loc_categories);
 
 router.get('/categories/:locations', action_get_categories);
 router.get('/category/:location', action_get_categories1);
@@ -53,22 +49,22 @@ function action_save_displays(req, res) {
         } else {
 
             Categories.findOrCreate({
-                "category_name" : req.body.group
-            }, function(err, category){
+                "category_name": req.body.group
+            }, function(err, category) {
                 Locations.findOrCreate({
-                    "city" : req.body.city,
-                    "state" : req.body.state,
-                    "latitude" : req.body.latitude,
-                    "longitude":req.body.longitude,
-                    "postal_code" : req.body.postal_code,
-                    "country" : req.body.country
-                }, function(err, location){
+                    "city": req.body.city,
+                    "state": req.body.state,
+                    "latitude": req.body.latitude,
+                    "longitude": req.body.longitude,
+                    "postal_code": req.body.postal_code,
+                    "country": req.body.country
+                }, function(err, location) {
                     displays.device_info = deviceinfo.id;
                     displays.group = category.id;
                     displays.locationId = location.id;
                     displays.display_name = req.body.display_name;
                     displays.orientation = req.body.orientation;
-                    displays.random_key =req.body.random_key;
+                    displays.random_key = req.body.random_key;
                     displays.layout_id = req.body.layout_id;
                     displays.devicesync = req.body.devicesync;
                     displays.location_photo = req.body.location_photo;
@@ -95,27 +91,27 @@ function action_list_displays(req, res, next) {
     var data = {};
     Display.count({}, function(err, c) {
         Display.find({}, {}, {
-            limit: req.query.limit ? req.query.limit : null,
-            sort: req.query.sort ? req.query.sort : "size",
-            skip: req.query.skip ? req.query.skip : null
-        }).populate('device_info')
-        .exec(function(err, display) {
-            if (err) {
-                res.json(err);
-            } else {
-                data.count = c;
-                data.display = display;
-                res.json(data);
-            }
-        });
-    }); 
+                limit: req.query.limit ? req.query.limit : null,
+                sort: req.query.sort ? req.query.sort : "size",
+                skip: req.query.skip ? req.query.skip : null
+            }).populate('device_info').populate('locations')
+            .exec(function(err, display) {
+                if (err) {
+                    res.json(err);
+                } else {
+                    data.count = c;
+                    data.display = display;
+                    res.json(data);
+                }
+            });
+    });
 }
 
 function action_get_locations(req, res, next) {
     Locations.find('city', {
-                "city": 1,
-                "_id": 1
-            }, function(err, locations) {
+        "city": 1,
+        "_id": 1
+    }, function(err, locations) {
         // console.log(device);
         if (err) {
             res.json(err);
@@ -285,9 +281,9 @@ function action_get_categories(req, res, next) {
 function action_get_categories1(req, res, next) {
 
     var city = {};
-    if(req.params.location == 'all') {
+    if (req.params.location == 'all') {
         console.log(null);
-    }else {
+    } else {
         city.city = req.params.location;
     }
     console.log(city);
@@ -328,15 +324,22 @@ function action_get_displays(req, res, next) {
 function action_get_displays1(req, res, next) {
     var searchObj;
 
-   if(req.params.city == 'all' && req.params.cat_id == 'all'){
+    if (req.params.city == 'all' && req.params.cat_id == 'all') {
         searchObj = {};
-   }else if(req.params.city != 'all' && req.params.cat_id == 'all'){
-        searchObj = { "city": req.params.city };
-   }else if(req.params.city != 'all' && req.params.cat_id != 'all'){
-        searchObj = { "city": req.params.city , "group" : req.params.cat_id };
-   }else if(req.params.city == 'all' && req.params.cat_id != 'all'){
-        searchObj = { "group" : req.params.cat_id };
-   }
+    } else if (req.params.city != 'all' && req.params.cat_id == 'all') {
+        searchObj = {
+            "city": req.params.city
+        };
+    } else if (req.params.city != 'all' && req.params.cat_id != 'all') {
+        searchObj = {
+            "city": req.params.city,
+            "group": req.params.cat_id
+        };
+    } else if (req.params.city == 'all' && req.params.cat_id != 'all') {
+        searchObj = {
+            "group": req.params.cat_id
+        };
+    }
     Display.find(searchObj, {
         "display_name": 1,
         "random_key": 1,
@@ -346,7 +349,24 @@ function action_get_displays1(req, res, next) {
     });
 }
 
+function action_loc_categories(req, res) {
+    if (!req.body) {
+        return res.status(400).send({
+            error: "body should not be empty"
+        });
+    }
+    Display.find({
+        "city": {
+            $in: req.body.city
+        }
+    }, {
+        "group": 1,
+        "_id": 0
+    }, function(err, groups) {
+        console.log(groups);
 
+    });
+}
 
 function unique(obj) {
     var uniques = [];
