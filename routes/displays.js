@@ -1,6 +1,7 @@
 var express = require('express');
 var global = require('../config/global.js');
 
+
 var router = express.Router();
 var _ = require('underscore');
 
@@ -23,6 +24,8 @@ router.get('/list/locations', action_get_locations);
 router.get('/category', fetch_categories);
 
 router.post('/locations/categories', action_loc_categories);
+
+
 
 router.get('/categories/:locations', action_get_categories);
 router.get('/category/:location', action_get_categories1);
@@ -356,15 +359,22 @@ function action_loc_categories(req, res) {
         });
     }
     Display.find({
-        "city": {
+        "locationId": {
             $in: req.body.city
         }
     }, {
         "group": 1,
         "_id": 0
     }, function(err, groups) {
-        console.log(groups);
-
+        console.log(_.pluck(groups, 'group'));
+        Categories.find({
+            "_id" : {$in: _.pluck(groups, 'group')}
+        },{
+            "_id" : 1,
+            "category_name" : 1
+        },function(err, categories){
+            res.json(categories);
+        })
     });
 }
 

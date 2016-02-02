@@ -19,6 +19,7 @@ module.exports = function(mongoose) {
         displayname: String,
         type: String,
         embbedcode: String,
+        group:String,
         settings: {
             type: Object
         },
