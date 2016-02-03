@@ -38,9 +38,8 @@ function action_save_schedular(req, res) {
         if (err) {
             res.json(err);
         } else {
-
+            console.log('---------------------Schedular Displays-------------');
             _.each(doc.displays, function(display, count) {
-                console.log(display);
                 var dataObject = {};
                 dataObject.display_id = display;
                 dataObject.schedular_id = doc.id;
@@ -48,10 +47,9 @@ function action_save_schedular(req, res) {
                 var scheduledisplay = new ScheduleDisplay(dataObject);
                 scheduledisplay.save(function(err, docs) {
                     console.log(docs);
-                    console.log(display.id);
                 });
             });
-
+            console.log('---------------------Schedular Displays-------------');
             var starttime = new Date(doc.start_time);
             var endtime = new Date(doc.start_time);
             var finalObj = {};
@@ -76,21 +74,27 @@ function action_save_schedular(req, res) {
                     });
                     starttime = new Date(starttime.getTime() + list.duration * 60 * 1000);
                     if (play_list.length === count + 1) {
-                        //console.log(playerlist);
                         finalObj.medialist = playerlist;
                         console.log(finalObj);
                         var displays = reqBody.displays;
-                        if (displays) {
-                            _.each(displays, function(display, index) {
-                                if (global.clients[display]) {
-                                    console.log(display);
-                                    global.clients[display].emit('scheduledlist', finalObj);
-                                }
-                                // if (displays.length = index + 1) {
+                        Display.find({
+                            "_id": {
+                                $in: displays
+                            }
+                        }, {
+                            "random_key": 1,
+                            "_id": 0
+                        }, function(err, keysObj) {
+                            var display_keys = _.pluck(keysObj, 'random_key');
+                            if (display_keys) {
+                                _.each(displays, function(display, index) {
+                                    if (global.clients[display]) {
+                                        global.clients[display].emit('scheduledlist', finalObj);
+                                    }
+                                });
+                            }
+                        })
 
-                                //}
-                            });
-                        }
                     }
                 });
                 res.json(doc);
