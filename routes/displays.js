@@ -98,7 +98,7 @@ function action_list_displays(req, res, next) {
                 limit: req.query.limit ? req.query.limit : null,
                 sort: req.query.sort ? req.query.sort : "size",
                 skip: req.query.skip ? req.query.skip : null
-            }).populate('device_info', 'categories')
+            }).populate('categories').populate('locations').populate('device_info')
             .exec(function(err, display) {
                 if (err) {
                     res.json(err);
@@ -360,17 +360,17 @@ function action_loc_categories(req, res) {
         });
     }
     Display.find({
-        "locationId": {
+        "locations": {
             $in: req.body.city
         }
     }, {
-        "group": 1,
+        "categories": 1,
         "_id": 0
     }, function(err, groups) {
-        console.log(_.pluck(groups, 'group'));
+        console.log(_.pluck(groups, 'categories'));
         Categories.find({
             "_id": {
-                $in: _.pluck(groups, 'group')
+                $in: _.pluck(groups, 'categories')
             }
         }, {
             "_id": 1,
@@ -384,10 +384,10 @@ function action_loc_categories(req, res) {
 function action_loc_cat_displays(req, res) {
 
     Display.find({
-        "locationId": {
+        "locations": {
             $in: req.body.city
         },
-        "group": {
+        "categories": {
             $in: req.body.group
         }
     }, {
@@ -395,7 +395,6 @@ function action_loc_cat_displays(req, res) {
         "_id": 1
     }, function(err, displays) {
         res.json(displays);
-        //console.log(_.pluck(groups, 'group'));
     });
 }
 
