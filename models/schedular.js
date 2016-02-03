@@ -8,8 +8,8 @@ module.exports = function(mongoose) {
             type: Schema.ObjectId,
             ref: 'Playlist'
         },
-        location: String,
-        categories: String,
+        locations: Array,
+        categories: Array,
         assets_count: String,
         video_duration: String,
         start_time: String,

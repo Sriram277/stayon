@@ -19,6 +19,7 @@ require('./models/socketsink')(mongoose);
 require('./models/trackstatus')(mongoose);
 require('./models/locations')(mongoose);
 require('./models/categories')(mongoose);
+require('./models/schedular_displays')(mongoose);
 
 
 var routes = require('./routes/index');

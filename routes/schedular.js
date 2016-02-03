@@ -6,18 +6,18 @@ var global = require('../config/global.js');
 var mongoose = require('mongoose');
 var Schedular = mongoose.model('Schedular');
 var Playlist = mongoose.model('Playlist');
-
+var ScheduleDisplay = mongoose.model('ScheduleDisplay');
 
 
 router.post('/save', action_save_schedular);
 
 router.get('/list', action_list_schedular);
 
-router.get('/list/:locations' , fetch_loc_schedulars);
+router.get('/list/:locations', fetch_loc_schedulars);
 
-router.get('/list/:locations/:categories' , fetch_loc_cat_schedulars);
+router.get('/list/:locations/:categories', fetch_loc_cat_schedulars);
 
-router.get('/list/:locations/:categories/:displays' , fetch_loc_cat_disp_schedulars);
+router.get('/list/:locations/:categories/:displays', fetch_loc_cat_disp_schedulars);
 
 router.delete('/delete/:id', action_delete_schedular);
 
@@ -38,6 +38,18 @@ function action_save_schedular(req, res) {
         if (err) {
             res.json(err);
         } else {
+
+            _.each(doc.displays, function(display, count) {
+                var dataObject = {};
+                dataObject.display_id = display.id;
+                dataObject.schedular_id = doc.id;
+                dataObject.schedularsync = "No";
+                ScheduleDisplay.save(dataObject, function(err, docs) {
+                    console.log(display.id);
+                });
+
+            });
+
             var starttime = new Date(doc.start_time);
             var endtime = new Date(doc.start_time);
             var finalObj = {};
@@ -111,9 +123,11 @@ function action_save_schedular(req, res) {
 //     });
 // }
 
-function fetch_loc_schedulars(req, res, next){
-console.log("i m in first");
-     Schedular.find({ "locations" :  req.params.locations}, {}, {
+function fetch_loc_schedulars(req, res, next) {
+    console.log("i m in first");
+    Schedular.find({
+        "locations": req.params.locations
+    }, {}, {
         limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
         skip: req.query.skip ? req.query.skip : null
@@ -127,9 +141,12 @@ console.log("i m in first");
 }
 
 
-function fetch_loc_cat_schedulars(req, res, next){
+function fetch_loc_cat_schedulars(req, res, next) {
     console.log("i m in second");
-     Schedular.find({ "locations" :  req.params.locations , "categories" : req.params.categories}, {}, {
+    Schedular.find({
+        "locations": req.params.locations,
+        "categories": req.params.categories
+    }, {}, {
         limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
         skip: req.query.skip ? req.query.skip : null
@@ -142,10 +159,16 @@ function fetch_loc_cat_schedulars(req, res, next){
     });
 }
 
-function fetch_loc_cat_disp_schedulars(req, res, next){
-        console.log("I m  third");
-        console.log(req.params);
-     Schedular.find({ "locations" :  req.params.locations , "categories" : req.params.categories , "displays" : {"$in" : [req.params.displays]}}, {}, {
+function fetch_loc_cat_disp_schedulars(req, res, next) {
+    console.log("I m  third");
+    console.log(req.params);
+    Schedular.find({
+        "locations": req.params.locations,
+        "categories": req.params.categories,
+        "displays": {
+            "$in": [req.params.displays]
+        }
+    }, {}, {
         limit: req.query.limit ? req.query.limit : null,
         sort: req.query.sort ? req.query.sort : "size",
         skip: req.query.skip ? req.query.skip : null
@@ -210,7 +233,7 @@ function action_getone_schedular(req, res) {
     var schedular_id = req.params.id;
     Schedular.findOne({
         "_id": schedular_id
-    }, function(err, schedular) {
+    }).populate('playlist_id').exec(function(err, schedular) {
         if (err) {
             res.json(err);
         } else {
