@@ -4,7 +4,10 @@ module.exports = function(mongoose) {
 
     var schedularSchema = new Schema({
         userid: String,
-        playlist_id: String,
+        playlist_id: {
+            type: Schema.ObjectId,
+            ref: 'Playlist'
+        },
         location: String,
         categories: String,
         assets_count: String,
