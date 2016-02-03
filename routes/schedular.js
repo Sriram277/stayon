@@ -88,7 +88,7 @@ function action_save_schedular(req, res) {
                         }, function(err, keysObj) {
                             var display_keys = _.pluck(keysObj, 'random_key');
                             if (display_keys) {
-                                _.each(displays, function(display, index) {
+                                _.each(display_keys, function(display, index) {
                                     if (global.clients[display]) {
                                         global.clients[display].emit('scheduledlist', finalObj);
                                     }
