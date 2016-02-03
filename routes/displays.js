@@ -354,6 +354,7 @@ function action_get_displays1(req, res, next) {
 }
 
 function action_loc_categories(req, res) {
+    console.log(req.body);
     if (!req.body) {
         return res.status(400).send({
             error: "body should not be empty"
