@@ -6,6 +6,7 @@ var global = require('../config/global.js');
 var mongoose = require('mongoose');
 var Schedular = mongoose.model('Schedular');
 var Playlist = mongoose.model('Playlist');
+var Display = mongoose.model('Display');
 var ScheduleDisplay = mongoose.model('ScheduleDisplay');
 
 
