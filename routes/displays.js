@@ -25,7 +25,7 @@ router.get('/category', fetch_categories);
 
 router.post('/locations/categories', action_loc_categories);
 
-router.post('/loc/cat/displays' , action_loc_cat_displays);
+router.post('/loc/cat/displays', action_loc_cat_displays);
 
 
 router.get('/categories/:locations', action_get_categories);
@@ -64,8 +64,8 @@ function action_save_displays(req, res) {
                     "country": req.body.country
                 }, function(err, location) {
                     displays.device_info = deviceinfo.id;
-                    displays.group = category.id;
-                    displays.locationId = location.id;
+                    displays.categories = category.id;
+                    displays.locations = location.id;
                     displays.display_name = req.body.display_name;
                     displays.orientation = req.body.orientation;
                     displays.random_key = req.body.random_key;
@@ -98,7 +98,7 @@ function action_list_displays(req, res, next) {
                 limit: req.query.limit ? req.query.limit : null,
                 sort: req.query.sort ? req.query.sort : "size",
                 skip: req.query.skip ? req.query.skip : null
-            }).populate('categories')
+            }).populate('device_info', 'categories')
             .exec(function(err, display) {
                 if (err) {
                     res.json(err);
@@ -369,23 +369,26 @@ function action_loc_categories(req, res) {
     }, function(err, groups) {
         console.log(_.pluck(groups, 'group'));
         Categories.find({
-            "_id" : {$in: _.pluck(groups, 'group')}
-        },{
-            "_id" : 1,
-            "category_name" : 1
-        },function(err, categories){
+            "_id": {
+                $in: _.pluck(groups, 'group')
+            }
+        }, {
+            "_id": 1,
+            "category_name": 1
+        }, function(err, categories) {
             res.json(categories);
         })
     });
 }
 
-function action_loc_cat_displays(req, res){
+function action_loc_cat_displays(req, res) {
 
     Display.find({
         "locationId": {
             $in: req.body.city
-        }, "group" : {
-            $in : req.body.group
+        },
+        "group": {
+            $in: req.body.group
         }
     }, {
         "display_name": 1,
