@@ -168,19 +168,26 @@ function action_remove_display(req, res) {
 function action_edit_display(req, res) {
 
     Categories.findOrCreate({ "category_name": req.body.group }, function(err, category) {
+        console.log(category);
         console.log("Category updated / or inserted");
         Locations.findOrCreate({
             "city": req.body.city, "state": req.body.state,
             "latitude": req.body.latitude, "longitude": req.body.longitude,
             "postal_code": req.body.postal_code, "country": req.body.country
-        }, function(err, location) {
+        }, function(err, locations) {
+            console.log(locations);
             console.log(" Locations Updated");
+            req.body.locations = locations.id;
+            req.body.categories = category.id;
+            delete req.body.state;
+            delete req.body.city;
+            delete req.body.latitude;
+            delete req.body.longitude;
             Display.findOneAndUpdate({
                 _id: req.params.id
             }, req.body, {
                 upsert: true
             }, function(err, display) {
-                console.log(err);
                 console.log(display);
                 if (!err) {
                     if (display) {
@@ -188,7 +195,7 @@ function action_edit_display(req, res) {
                             global.clients[display.random_key].emit('editdisplay_updated', display);
                         }
                     }
-                res.json(display);
+                    res.json(display);
                 } else {
                     res.json(err);
                 }
