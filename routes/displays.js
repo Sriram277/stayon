@@ -316,7 +316,7 @@ function fetch_categories(req, res, next) {
 function action_get_displays(req, res, next) {
 
     Display.find({
-        "group": req.params.cat_id
+        "categories": req.params.cat_id
     }, {
         "display_name": 1,
         "_id": 0
