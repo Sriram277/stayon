@@ -166,23 +166,34 @@ function action_remove_display(req, res) {
 }
 
 function action_edit_display(req, res) {
-    Display.findOneAndUpdate({
-        _id: req.params.id
-    }, req.body, {
-        upsert: true
-    }, function(err, display) {
-        console.log(err);
-        console.log(display);
-        if (!err) {
-            if (display) {
-                if (global.clients[display.random_key]) {
-                    global.clients[display.random_key].emit('editdisplay_updated', display);
+
+    Categories.findOrCreate({ "category_name": req.body.group }, function(err, category) {
+        console.log("Category updated / or inserted");
+        Locations.findOrCreate({
+            "city": req.body.city, "state": req.body.state,
+            "latitude": req.body.latitude, "longitude": req.body.longitude,
+            "postal_code": req.body.postal_code, "country": req.body.country
+        }, function(err, location) {
+            console.log(" Locations Updated");
+            Display.findOneAndUpdate({
+                _id: req.params.id
+            }, req.body, {
+                upsert: true
+            }, function(err, display) {
+                console.log(err);
+                console.log(display);
+                if (!err) {
+                    if (display) {
+                        if (global.clients[display.random_key]) {
+                            global.clients[display.random_key].emit('editdisplay_updated', display);
+                        }
+                    }
+                res.json(display);
+                } else {
+                    res.json(err);
                 }
-            }
-            res.json(display);
-        } else {
-            res.json(err);
-        }
+            });
+        });
     });
 }
 
