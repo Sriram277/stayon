@@ -38,13 +38,15 @@ function action_save_schedular(req, res) {
         if (err) {
             res.json(err);
         } else {
-
+            var scheduledisplay = new ScheduleDisplay();
             _.each(doc.displays, function(display, count) {
+                console.log(display);
                 var dataObject = {};
                 dataObject.display_id = display.id;
                 dataObject.schedular_id = doc.id;
                 dataObject.schedularsync = "No";
-                ScheduleDisplay.save(dataObject, function(err, docs) {
+                scheduledisplay.save(dataObject, function(err, docs) {
+                    console.log(docs);
                     console.log(display.id);
                 });
 
